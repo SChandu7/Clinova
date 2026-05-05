@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Articles – Clinova Multi-disciplinary Research Journal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    :root { --font-serif:'Playfair Display','Source Serif 4',Georgia,serif; --font-sans:'DM Sans',-apple-system,sans-serif; }
+    .filter-sidebar {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      align-self: start;
+      position: sticky;
+      top: 16px;
+    }
+    .filter-sidebar h4 {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--primary-darker);
+      font-family: var(--font-sans);
+      font-weight: 700;
+      margin: 0 0 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .filter-group { margin-bottom: 20px; }
+    .filter-group h5 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 0;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      transition: color 0.15s;
+    }
+    .filter-option:hover { color: var(--primary); }
+    .filter-option input[type="checkbox"] { accent-color: var(--primary); width: 15px; height: 15px; cursor: pointer; }
+    .filter-option.active { color: var(--primary); font-weight: 600; }
+    .filter-count {
+      margin-left: auto;
+      font-size: 0.72rem;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      border-radius: 999px;
+      color: var(--text-muted);
+    }
+    .articles-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 28px;
+      align-items: start;
+      padding: 36px 0 64px;
+    }
+    @media (max-width: 860px) {
+      .articles-layout { grid-template-columns: 1fr; }
+      .filter-sidebar { position: static; }
+    }
+    .search-results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .results-count { font-size: 0.9rem; color: var(--text-muted); }
+    .results-count strong { color: var(--text); }
+    .sort-select {
+      padding: 8px 14px;
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+    }
+    .search-bar-main {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .search-bar-main .form-input { flex: 1; padding: 11px 16px; border-radius: var(--radius); }
+    .active-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .filter-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: var(--primary-50);
+      color: var(--primary);
+      border: 1px solid var(--primary-100);
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .filter-tag button { color: var(--primary); display: grid; place-items: center; }
+    /* Article detail view */
+    #article-detail { display: none; }
+    #articles-list-view { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- Announcement -->
+<div class="announce-bar" style="background:var(--gold);color:var(--primary-darker);text-align:center;padding:9px 20px;font-size:.82rem;font-weight:600;">
+  ✦ Call for papers — Volume 8, Issue 3 (2026) now open — <a href="dashboard.html" style="color:var(--primary-darker);text-decoration:underline;">Submit Now</a> ✦
+</div>
+
+<!-- Top bar -->
+<div class="top-bar">
+  <div class="container">
+    <div class="top-bar-inner">
+      <div class="top-bar-text">ISSN (Online): 2984-7310 &nbsp;·&nbsp; ISSN (Print): 2984-8821</div>
+      <div class="top-bar-actions">
+        <a href="dashboard.html" class="top-bar-link">Login / Register</a>
+        <a href="dashboard.html" class="top-bar-link">Submit Article</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 28 28" fill="none"><path d="M14 3L14 25M7 8L14 3L21 8M7 20L14 25L21 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="14" r="3.5" fill="currentColor" opacity=".8"/><path d="M4 14h5M19 14h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Clinova</span>
+          <span class="brand-subtitle">Multi-disciplinary Research Journal</span>
+        </div>
+      </a>
+      <div class="header-search">
+        <form class="search-form" onsubmit="handleInlineSearch(event)">
+          <input type="text" id="header-search-input" placeholder="Search articles, authors, keywords…" autocomplete="off" />
+          <button type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg></button>
+        </form>
+      </div>
+      <button class="header-mobile-toggle" id="mobile-menu-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-search-bar" style="display:none;padding:12px 20px;background:var(--bg-alt);border-bottom:1px solid var(--border);">
+  <form class="search-form" onsubmit="handleInlineSearch(event)">
+    <input type="text" placeholder="Search…" />
+    <button type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg></button>
+  </form>
+</div>
+
+<div class="nav-overlay" id="nav-overlay"></div>
+<nav class="main-nav" id="main-nav">
+  <div class="main-nav-mobile-close">
+    <span>Clinova</span>
+    <button id="mobile-menu-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <ul class="main-nav-list">
+    <li><a href="index.html" class="main-nav-link">Home</a></li>
+    <li><a href="articles.html" class="main-nav-link active">Articles</a></li>
+    <li><a href="about.html" class="main-nav-link">About Us</a></li>
+    <li><a href="about.html#ethics" class="main-nav-link">Ethical Guidelines</a></li>
+    <li><a href="about.html#contact" class="main-nav-link">Contact</a></li>
+    <li><a href="dashboard.html" class="main-nav-link">Submit Article</a></li>
+  </ul>
+</nav>
+
+<!-- Page hero -->
+<div class="page-hero" id="page-hero-articles">
+  <div class="container page-hero-content">
+    <div class="breadcrumb"><a href="index.html">Home</a><span class="breadcrumb-sep"></span><span>Articles</span></div>
+    <h1>All Published Articles</h1>
+    <p>Browse our complete library of peer-reviewed research spanning medical sciences, engineering, technology, and natural sciences.</p>
+  </div>
+</div>
+
+<!-- ARTICLE DETAIL VIEW (hidden by default, shown on click) -->
+<div id="article-detail">
+  <div class="container">
+    <div class="article-detail-shell">
+      <button onclick="closeArticleDetail()" class="btn btn-ghost btn-small" style="margin-bottom:22px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Articles
+      </button>
+      <div class="article-detail-grid">
+        <div class="article-detail-main">
+          <div class="article-detail-type" id="det-type">Original Article</div>
+          <h1 class="article-detail-title" id="det-title"></h1>
+          <p class="article-detail-authors" id="det-authors"></p>
+          <div class="article-detail-info">
+            <span><strong>DOI:</strong> <span id="det-doi"></span></span>
+            <span><strong>Volume:</strong> <span id="det-vol"></span></span>
+            <span><strong>Published:</strong> <span id="det-date"></span></span>
+            <span><strong>Category:</strong> <span id="det-cat"></span></span>
+          </div>
+          <div class="article-abstract">
+            <h3>Abstract</h3>
+            <p id="det-abstract"></p>
+          </div>
+          <div>
+            <p style="font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:8px;">Keywords</p>
+            <div class="keywords" id="det-keywords"></div>
+          </div>
+          <!-- PDF Viewer -->
+          <div style="margin-top:28px;">
+            <h3 style="font-size:1rem;margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em;font-family:var(--font-sans);font-size:.8rem;color:var(--primary-darker);">Full Text Document</h3>
+            <div class="pdf-frame" id="det-pdf-frame">
+              <div class="pdf-fallback" id="det-pdf-fallback">
+                <div style="color:var(--text-muted);margin-bottom:16px;">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <h3 style="color:var(--text-secondary);">Document Preview</h3>
+                <p style="color:var(--text-muted);margin-bottom:18px;" id="det-pdf-msg">This article's document will appear here once it is uploaded by the author and approved.</p>
+                <a href="#" id="det-download-btn" class="btn btn-primary" style="display:none;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Download Document
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="article-detail-side">
+          <div class="side-card">
+            <h4>Article Actions</h4>
+            <div class="actions">
+              <a href="#" id="det-pdf-btn" class="btn btn-primary btn-small">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download PDF
+              </a>
+              <button onclick="window.print()" class="btn btn-ghost btn-small">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                Print Article
+              </button>
+            </div>
+          </div>
+          <div class="side-card">
+            <h4>Article Details</h4>
+            <div class="side-stat"><span>Type</span><strong id="det-type2">—</strong></div>
+            <div class="side-stat"><span>Volume</span><strong id="det-vol2">—</strong></div>
+            <div class="side-stat"><span>Year</span><strong id="det-year2">—</strong></div>
+            <div class="side-stat"><span>Citations</span><strong id="det-cites">0</strong></div>
+            <div class="side-stat"><span>Views</span><strong id="det-views">—</strong></div>
+          </div>
+          <div class="side-card">
+            <h4>How to Cite</h4>
+            <p id="det-cite-text" style="font-size:.82rem;color:var(--text-secondary);line-height:1.6;margin:0;font-style:italic;"></p>
+            <button onclick="copyCitation()" class="btn btn-ghost btn-small" style="margin-top:10px;width:100%;">Copy Citation</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ARTICLES LIST VIEW -->
+<div id="articles-list-view">
+  <div class="container">
+    <div class="articles-layout">
+      <!-- Sidebar filters -->
+      <aside class="filter-sidebar">
+        <h4>Filter Articles</h4>
+        <div class="filter-group">
+          <h5>Discipline</h5>
+          <label class="filter-option"><input type="checkbox" value="medical" onchange="applyFilters()" /> Medical &amp; Health <span class="filter-count" id="cnt-medical">—</span></label>
+          <label class="filter-option"><input type="checkbox" value="tech" onchange="applyFilters()" /> Engineering &amp; Tech <span class="filter-count" id="cnt-tech">—</span></label>
+          <label class="filter-option"><input type="checkbox" value="science" onchange="applyFilters()" /> Natural Sciences <span class="filter-count" id="cnt-science">—</span></label>
+        </div>
+        <div class="filter-group">
+          <h5>Article Type</h5>
+          <label class="filter-option"><input type="checkbox" value="Original Article" onchange="applyFilters()" /> Original Article</label>
+          <label class="filter-option"><input type="checkbox" value="Review Article" onchange="applyFilters()" /> Review Article</label>
+          <label class="filter-option"><input type="checkbox" value="Case Report" onchange="applyFilters()" /> Case Report</label>
+          <label class="filter-option"><input type="checkbox" value="Editorial" onchange="applyFilters()" /> Editorial</label>
+          <label class="filter-option"><input type="checkbox" value="Conference Abstract" onchange="applyFilters()" /> Conference Abstract</label>
+        </div>
+        <div class="filter-group">
+          <h5>Year</h5>
+          <label class="filter-option"><input type="checkbox" value="2026" onchange="applyFilters()" /> 2026</label>
+          <label class="filter-option"><input type="checkbox" value="2025" onchange="applyFilters()" /> 2025</label>
+          <label class="filter-option"><input type="checkbox" value="2024" onchange="applyFilters()" /> 2024</label>
+          <label class="filter-option"><input type="checkbox" value="2023" onchange="applyFilters()" /> 2023</label>
+        </div>
+        <button onclick="clearAllFilters()" class="btn btn-ghost btn-small" style="width:100%;margin-top:6px;">Clear All Filters</button>
+      </aside>
+
+      <!-- Articles main -->
+      <div>
+        <div class="search-bar-main">
+          <input class="form-input" type="text" id="article-search" placeholder="Search by title, author, keyword, DOI…" oninput="applyFilters()" />
+        </div>
+        <div class="active-filters" id="active-filters"></div>
+        <div class="search-results-bar">
+          <div class="results-count">Showing <strong id="showing-count">0</strong> articles</div>
+          <select class="sort-select" id="sort-select" onchange="applyFilters()">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="title">Title A–Z</option>
+          </select>
+        </div>
+        <div class="articles-list" id="articles-main-list"></div>
+        <div id="articles-empty" class="empty-state hidden">
+          <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+          <h3>No articles found</h3>
+          <p>Try adjusting your search or clearing filters.</p>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="brand"><div class="brand-logo"><svg viewBox="0 0 28 28" fill="none"><path d="M14 3L14 25M7 8L14 3L21 8M7 20L14 25L21 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="14" r="3.5" fill="currentColor" opacity=".8"/></svg></div><div class="brand-text"><span class="brand-title">Clinova</span><span class="brand-subtitle">Multi-disciplinary Research</span></div></div>
+        <p class="footer-tagline">"Advancing knowledge across the frontiers of medicine, technology, and science."</p>
+        <div class="footer-issn"><div><strong>ISSN (Online):</strong> 2984-7310</div><div><strong>ISSN (Print):</strong> 2984-8821</div></div>
+      </div>
+      <div class="footer-col"><h5>Journal</h5><ul><li><a href="index.html">Home</a></li><li><a href="articles.html">All Articles</a></li><li><a href="about.html">About Us</a></li><li><a href="about.html#ethics">Ethical Guidelines</a></li></ul></div>
+      <div class="footer-col"><h5>Authors</h5><ul><li><a href="dashboard.html">Submit Article</a></li><li><a href="dashboard.html">Author Dashboard</a></li><li><a href="about.html#contact">Contact Editors</a></li></ul></div>
+      <div class="footer-col"><h5>Contact</h5><div class="footer-contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>editor@clinova.org</div></div>
+    </div>
+    <div class="footer-bottom"><div>© 2026 Clinova Research Society. Published under CC BY-NC-SA 4.0.</div></div>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script src="js/articles.js"></script>
+</body>
+</html>

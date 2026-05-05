@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us – Clinova Multi-disciplinary Research Journal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    :root { --font-serif:'Playfair Display','Source Serif 4',Georgia,serif; --font-sans:'DM Sans',-apple-system,sans-serif; }
+    .about-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 40px;
+      padding: 48px 0 80px;
+      align-items: start;
+    }
+    @media (max-width: 860px) { .about-layout { grid-template-columns: 1fr; } }
+    .about-toc {
+      position: sticky;
+      top: 96px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+    @media (max-width: 860px) { .about-toc { position: static; } }
+    .about-toc h4 {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--primary-darker);
+      margin: 0 0 12px;
+      font-family: var(--font-sans);
+      font-weight: 700;
+    }
+    .about-toc-list { list-style: none; padding: 0; margin: 0; }
+    .about-toc-list li { margin-bottom: 4px; }
+    .about-toc-list a {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      display: block;
+      padding: 5px 8px;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s;
+    }
+    .about-toc-list a:hover, .about-toc-list a.active {
+      background: var(--primary-50);
+      color: var(--primary);
+    }
+    .about-section {
+      margin-bottom: 64px;
+      scroll-margin-top: 100px;
+    }
+    .about-section:last-child { margin-bottom: 0; }
+    /* Ethics accordion */
+    .ethics-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .ethics-item-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      cursor: pointer;
+      background: var(--bg-alt);
+      transition: background 0.15s;
+      user-select: none;
+    }
+    .ethics-item-head:hover { background: var(--primary-50); }
+    .ethics-item-head h4 { margin: 0; font-size: 1rem; color: var(--primary-darker); }
+    .ethics-chevron {
+      width: 20px; height: 20px;
+      color: var(--gold-dark);
+      transition: transform 0.25s;
+      flex-shrink: 0;
+    }
+    .ethics-item.open .ethics-chevron { transform: rotate(180deg); }
+    .ethics-item-body {
+      display: none;
+      padding: 18px 22px 20px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .ethics-item.open .ethics-item-body { display: block; }
+    /* Contact form */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    @media (max-width: 700px) { .contact-grid { grid-template-columns: 1fr; } }
+    .contact-info-item {
+      display: flex;
+      gap: 14px;
+      padding: 18px;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+    }
+    .contact-info-icon {
+      width: 40px; height: 40px;
+      background: var(--primary);
+      color: var(--gold-light);
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .contact-info-icon svg { width: 18px; height: 18px; }
+    .contact-info-text h5 { margin: 0 0 3px; font-size: .92rem; color: var(--primary-darker); }
+    .contact-info-text p { margin: 0; font-size: .88rem; color: var(--text-secondary); }
+    .contact-info-text a { color: var(--primary); }
+    /* Mission banner */
+    .mission-banner {
+      background: linear-gradient(135deg, var(--primary-darker), var(--primary));
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 40px 36px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+    .mission-banner::before {
+      content: '"';
+      position: absolute;
+      top: -10px; left: 20px;
+      font-family: var(--font-serif);
+      font-size: 180px;
+      color: rgba(201,169,97,0.12);
+      line-height: 1;
+      pointer-events: none;
+    }
+    .mission-banner blockquote {
+      font-family: var(--font-serif);
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      font-style: italic;
+      color: white;
+      margin: 0 0 12px;
+      position: relative;
+      border: 0;
+      padding: 0;
+      background: transparent;
+    }
+    .mission-banner cite { font-size: .85rem; color: var(--gold-light); font-style: normal; }
+    /* Awards strip */
+    .awards-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+    .award-item {
+      text-align: center;
+      padding: 20px 14px;
+      background: var(--bg-warm);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      border-top: 3px solid var(--gold);
+    }
+    .award-item strong { display: block; font-family: var(--font-serif); font-size: 1.4rem; color: var(--primary); }
+    .award-item span { font-size: .78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .07em; }
+  </style>
+</head>
+<body>
+
+<div class="announce-bar" style="background:var(--gold);color:var(--primary-darker);text-align:center;padding:9px 20px;font-size:.82rem;font-weight:600;">
+  ✦ Now accepting manuscripts for Volume 8, 2026 — <a href="dashboard.html" style="color:var(--primary-darker);text-decoration:underline;">Submit your research</a> ✦
+</div>
+
+<div class="top-bar">
+  <div class="container">
+    <div class="top-bar-inner">
+      <div class="top-bar-text">ISSN (Online): 2984-7310 &nbsp;·&nbsp; ISSN (Print): 2984-8821</div>
+      <div class="top-bar-actions">
+        <a href="dashboard.html" class="top-bar-link">Login / Register</a>
+        <a href="dashboard.html" class="top-bar-link">Submit Article</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo"><svg viewBox="0 0 28 28" fill="none"><path d="M14 3L14 25M7 8L14 3L21 8M7 20L14 25L21 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="14" r="3.5" fill="currentColor" opacity=".8"/><path d="M4 14h5M19 14h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <div class="brand-text"><span class="brand-title">Clinova</span><span class="brand-subtitle">Multi-disciplinary Research Journal</span></div>
+      </a>
+      <div class="header-search">
+        <form class="search-form" onsubmit="handleSearch(event)">
+          <input type="text" placeholder="Search articles…" autocomplete="off" />
+          <button type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg></button>
+        </form>
+      </div>
+      <button class="header-mobile-toggle" id="mobile-menu-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<div class="nav-overlay" id="nav-overlay"></div>
+<nav class="main-nav" id="main-nav">
+  <div class="main-nav-mobile-close"><span>Clinova</span><button id="mobile-menu-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <ul class="main-nav-list">
+    <li><a href="index.html" class="main-nav-link">Home</a></li>
+    <li><a href="articles.html" class="main-nav-link">Articles</a></li>
+    <li><a href="about.html" class="main-nav-link active">About Us</a></li>
+    <li><a href="about.html#ethics" class="main-nav-link">Ethical Guidelines</a></li>
+    <li><a href="about.html#contact" class="main-nav-link">Contact</a></li>
+    <li><a href="dashboard.html" class="main-nav-link">Submit Article</a></li>
+  </ul>
+</nav>
+
+<div class="page-hero">
+  <div class="container page-hero-content">
+    <div class="breadcrumb"><a href="index.html">Home</a><span class="breadcrumb-sep"></span><span>About Us</span></div>
+    <h1>About Clinova Journal</h1>
+    <p>Learn about our mission, editorial team, publication ethics, and how to connect with us.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="about-layout">
+    <!-- Sticky TOC -->
+    <aside class="about-toc">
+      <h4>On this page</h4>
+      <ul class="about-toc-list">
+        <li><a href="#about">About the Journal</a></li>
+        <li><a href="#aims">Aims &amp; Scope</a></li>
+        <li><a href="#editorial">Editorial Board</a></li>
+        <li><a href="#review">Review Process</a></li>
+        <li><a href="#indexing">Indexing</a></li>
+        <li><a href="#ethics">Ethical Guidelines</a></li>
+        <li><a href="#oa">Open Access</a></li>
+        <li><a href="#contact">Contact Us</a></li>
+      </ul>
+    </aside>
+
+    <div class="about-main">
+
+      <!-- About -->
+      <section class="about-section" id="about">
+        <div class="mission-banner">
+          <blockquote>"Advancing knowledge across the frontiers of medicine, technology, and science — open and free for all."</blockquote>
+          <cite>— Clinova Editorial Committee, 2019</cite>
+        </div>
+        <h2 class="section-title">About the Journal</h2>
+        <div class="prose">
+          <p>The <strong>Clinova Multi-disciplinary Research Journal (CMRJ)</strong> is an open-access, peer-reviewed publication committed to disseminating original, high-quality research that bridges the disciplines of Medical &amp; Healthcare Sciences, Engineering &amp; Technology, and Natural Sciences.</p>
+          <p>Clinova is owned and published by the <strong>Clinova Research Society</strong>, an international consortium of researchers, clinicians, and engineers dedicated to advancing knowledge through rigorous scholarly publishing. Since our founding in 2019, Clinova has grown to become a respected platform for multi-disciplinary research with contributors from over 40 countries.</p>
+          <p>The journal publishes original research articles, systematic reviews, meta-analyses, case reports, technical communications, editorials, and conference abstracts. Every submission undergoes our strict double-blind peer review process before acceptance.</p>
+        </div>
+        <div class="awards-strip">
+          <div class="award-item"><strong>248+</strong><span>Articles Published</span></div>
+          <div class="award-item"><strong>40+</strong><span>Countries Represented</span></div>
+          <div class="award-item"><strong>0.9</strong><span>Scopus CiteScore</span></div>
+          <div class="award-item"><strong>18 days</strong><span>Avg. Review Time</span></div>
+          <div class="award-item"><strong>6+</strong><span>Years Publishing</span></div>
+        </div>
+      </section>
+
+      <!-- Aims & Scope -->
+      <section class="about-section" id="aims">
+        <h2 class="section-title">Aims &amp; Scope</h2>
+        <div class="prose">
+          <p>Clinova covers three major pillars of contemporary research:</p>
+          <h3>Medical &amp; Healthcare Sciences</h3>
+          <p>Cardiovascular diseases, oncology, neurology, psychiatry, paediatrics, endocrinology, infectious diseases, surgery, radiology, public health, epidemiology, pharmacology, and clinical trials.</p>
+          <h3>Engineering &amp; Technology</h3>
+          <p>Artificial intelligence and machine learning, biomedical engineering, IoT and embedded systems, computer vision, robotics, data science, software engineering, cloud computing, and cybersecurity.</p>
+          <h3>Natural Sciences</h3>
+          <p>Biochemistry, molecular biology, genetics, environmental science, nanotechnology, materials science, chemistry, physics applications, and earth sciences.</p>
+          <h3>Article Types Accepted</h3>
+          <ul>
+            <li><strong>Original Research Articles</strong> — novel findings with full methodology</li>
+            <li><strong>Review Articles &amp; Meta-analyses</strong> — comprehensive literature synthesis</li>
+            <li><strong>Case Reports</strong> — clinically significant or technologically novel cases</li>
+            <li><strong>Technical Communications</strong> — short, focused technical findings</li>
+            <li><strong>Editorials</strong> — commentary on current issues in research</li>
+            <li><strong>Conference Abstracts</strong> — proceedings from affiliated conferences</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Editorial Board -->
+      <section class="about-section" id="editorial">
+        <h2 class="section-title">Editorial Board</h2>
+        <p class="section-subtitle">Our board comprises domain experts from leading institutions worldwide.</p>
+        <div class="editorial-grid">
+          <div class="editor-card editor-chief">
+            <div class="editor-avatar">AK</div>
+            <h3>Dr. Ananya Krishnamurthy</h3>
+            <div class="editor-role">Editor-in-Chief</div>
+            <p class="editor-affil">Professor, Department of Internal Medicine<br>All India Institute of Medical Sciences, New Delhi</p>
+          </div>
+          <div class="editor-card">
+            <div class="editor-avatar">RS</div>
+            <h3>Prof. Rajiv Sharma</h3>
+            <div class="editor-role">Associate Editor – Medical Sciences</div>
+            <p class="editor-affil">Senior Consultant, Cardiology<br>NIMHANS, Bengaluru, India</p>
+          </div>
+          <div class="editor-card">
+            <div class="editor-avatar">PM</div>
+            <h3>Dr. Priya Menon</h3>
+            <div class="editor-role">Associate Editor – Technology</div>
+            <p class="editor-affil">Associate Professor, Computer Science &amp; AI<br>IIT Madras, Chennai, India</p>
+          </div>
+          <div class="editor-card">
+            <div class="editor-avatar">VN</div>
+            <h3>Dr. Venkat Narayanan</h3>
+            <div class="editor-role">Section Editor – Oncology</div>
+            <p class="editor-affil">Head, Dept. of Surgical Oncology<br>Tata Memorial Hospital, Mumbai</p>
+          </div>
+          <div class="editor-card">
+            <div class="editor-avatar">SP</div>
+            <h3>Dr. Sunita Patel</h3>
+            <div class="editor-role">Section Editor – Pharmacology</div>
+            <p class="editor-affil">Research Director<br>CSIR-CDRI, Lucknow, India</p>
+          </div>
+          <div class="editor-card">
+            <div class="editor-avatar">AR</div>
+            <h3>Prof. Arjun Rao</h3>
+            <div class="editor-role">Statistical Editor</div>
+            <p class="editor-affil">Professor of Biostatistics<br>Sri Ramachandra Institute, Chennai</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Review Process -->
+      <section class="about-section" id="review">
+        <h2 class="section-title">Review Process</h2>
+        <div class="prose">
+          <p>Clinova follows a rigorous <strong>double-blind peer review</strong> system, where neither authors nor reviewers know each other's identities throughout the review process. This ensures unbiased evaluation based solely on scientific merit.</p>
+          <h3>Review Stages</h3>
+          <ul>
+            <li><strong>Initial Editorial Screening (1–3 days):</strong> Manuscripts are assessed for scope, formatting compliance, and ethical standards by the editorial team.</li>
+            <li><strong>Plagiarism Check:</strong> All manuscripts are screened using iThenticate before external review. Manuscripts with confirmed plagiarism are rejected immediately.</li>
+            <li><strong>External Peer Review (10–14 days):</strong> Each manuscript is assigned to at least two independent domain experts. Reviewers evaluate scientific rigor, originality, methodology, and clarity.</li>
+            <li><strong>Editorial Decision:</strong> The Editor-in-Chief makes the final decision: Accept, Minor Revision, Major Revision, or Reject — based on reviewer recommendations.</li>
+            <li><strong>Production &amp; Publication:</strong> Accepted manuscripts are copy-edited, typeset, and published online with a DOI.</li>
+          </ul>
+          <p>Clinova follows the <strong>Committee on Publication Ethics (COPE)</strong> guidelines at every stage of the publication process.</p>
+        </div>
+      </section>
+
+      <!-- Indexing -->
+      <section class="about-section" id="indexing">
+        <h2 class="section-title">Abstracting &amp; Indexing</h2>
+        <div class="prose">
+          <p>Clinova is indexed in the following major databases:</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:18px 0;">
+          <div style="padding:16px 20px;background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius);text-align:center;"><strong style="display:block;font-size:1.1rem;color:var(--primary);">SCOPUS</strong><span style="font-size:.78rem;color:var(--text-muted);">CiteScore: 0.9</span></div>
+          <div style="padding:16px 20px;background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius);text-align:center;"><strong style="display:block;font-size:1.1rem;color:var(--primary);">EMBASE</strong><span style="font-size:.78rem;color:var(--text-muted);">Excerpta Medica</span></div>
+          <div style="padding:16px 20px;background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius);text-align:center;"><strong style="display:block;font-size:1.1rem;color:var(--primary);">EBSCO</strong><span style="font-size:.78rem;color:var(--text-muted);">Full-text indexed</span></div>
+          <div style="padding:16px 20px;background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius);text-align:center;"><strong style="display:block;font-size:1.1rem;color:var(--primary);">CrossRef</strong><span style="font-size:.78rem;color:var(--text-muted);">DOI Registration</span></div>
+          <div style="padding:16px 20px;background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius);text-align:center;"><strong style="display:block;font-size:1.1rem;color:var(--primary);">Google Scholar</strong><span style="font-size:.78rem;color:var(--text-muted);">Full indexing</span></div>
+          <div style="padding:16px 20px;background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius);text-align:center;"><strong style="display:block;font-size:1.1rem;color:var(--primary);">DOAJ</strong><span style="font-size:.78rem;color:var(--text-muted);">Open access listed</span></div>
+        </div>
+        <div class="prose"><p>All published articles are archived in <strong>PORTICO</strong> for long-term digital preservation. Each article receives a unique <strong>Digital Object Identifier (DOI)</strong> via CrossRef.</p></div>
+      </section>
+
+      <!-- Ethical Guidelines -->
+      <section class="about-section" id="ethics">
+        <h2 class="section-title">Ethical Guidelines</h2>
+        <div class="prose" style="margin-bottom:22px;">
+          <p>The editorial team of Clinova is committed to the highest standards of integrity, transparency, and ethical practice in scholarly publishing. Our policies follow internationally recognized best practices including <strong>COPE, ICMJE, and WAME</strong> guidelines.</p>
+        </div>
+
+        <div class="ethics-item open">
+          <div class="ethics-item-head" onclick="toggleEthics(this)">
+            <h4>Plagiarism Policy</h4>
+            <svg class="ethics-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="ethics-item-body prose">
+            <p>Plagiarism — whether of words, ideas, images, or data — is unacceptable. This includes self-plagiarism, where authors reuse their own previously published material without proper citation.</p>
+            <p>All manuscripts are screened using <strong>iThenticate</strong> before review. Editors and reviewers have access to these reports, and manuscripts with confirmed plagiarism are rejected outright.</p>
+          </div>
+        </div>
+
+        <div class="ethics-item">
+          <div class="ethics-item-head" onclick="toggleEthics(this)">
+            <h4>Peer Review Policy</h4>
+            <svg class="ethics-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="ethics-item-body prose">
+            <p>Clinova follows a <strong>double-blind peer review</strong> system to ensure fair and unbiased evaluation. Author and reviewer identities are kept confidential throughout the review. We follow the COPE Ethical Guidelines for Peer Reviewers.</p>
+          </div>
+        </div>
+
+        <div class="ethics-item">
+          <div class="ethics-item-head" onclick="toggleEthics(this)">
+            <h4>Conflicts of Interest</h4>
+            <svg class="ethics-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="ethics-item-body prose">
+            <p>Authors must disclose any potential conflicts — financial or otherwise — at the time of submission. These disclosures appear in the published article. We follow COPE guidance on conflicts of interest.</p>
+          </div>
+        </div>
+
+        <div class="ethics-item">
+          <div class="ethics-item-head" onclick="toggleEthics(this)">
+            <h4>Errata, Retractions &amp; Withdrawals</h4>
+            <svg class="ethics-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="ethics-item-body prose">
+            <ul>
+              <li><strong>Errata:</strong> For factual errors that do not affect conclusions. A correction is published and linked to the original article.</li>
+              <li><strong>Retractions:</strong> Issued when findings are invalidated due to serious errors, plagiarism, or misconduct. The original article remains with a "Retracted" watermark. We follow COPE Retraction Guidelines.</li>
+              <li><strong>Withdrawals:</strong> Applied before or after acceptance when ethical or legal issues arise.</li>
+              <li><strong>Expressions of Concern:</strong> Published when validity is in question but investigations are ongoing.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="ethics-item">
+          <div class="ethics-item-head" onclick="toggleEthics(this)">
+            <h4>Patient Consent &amp; Ethics Approval</h4>
+            <svg class="ethics-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="ethics-item-body prose">
+            <p>Informed consent is required for all human participants. Manuscripts must include a statement confirming consent was obtained. Human studies require <strong>Institutional Review Board (IRB)</strong> approval with protocol number. Research involving humans must comply with the <strong>Declaration of Helsinki</strong>. Animal studies require institutional animal ethics committee approval.</p>
+          </div>
+        </div>
+
+        <div class="ethics-item">
+          <div class="ethics-item-head" onclick="toggleEthics(this)">
+            <h4>Use of Artificial Intelligence (AI)</h4>
+            <svg class="ethics-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="ethics-item-body prose">
+            <p>Following WAME recommendations: AI tools (e.g., ChatGPT, Claude) cannot be listed as authors. Any AI use in research, writing, or image preparation must be disclosed in the manuscript. Authors are fully responsible for accuracy, originality, and absence of plagiarism regardless of AI use.</p>
+          </div>
+        </div>
+
+        <div class="ethics-item">
+          <div class="ethics-item-head" onclick="toggleEthics(this)">
+            <h4>Image Quality Standards</h4>
+            <svg class="ethics-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="ethics-item-body prose">
+            <p>All images must be at least <strong>300 DPI</strong> resolution and, when applicable, contain clear arrows or markers highlighting key findings. Clinical photographs must have eyes obscured. Radiologic images must not display patient names or identification. Low-quality images may be returned for revision before review.</p>
+          </div>
+        </div>
+
+        <div class="ethics-item">
+          <div class="ethics-item-head" onclick="toggleEthics(this)">
+            <h4>In-House Submissions &amp; Editorial Independence</h4>
+            <svg class="ethics-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="ethics-item-body prose">
+            <p>Manuscripts submitted by Editors-in-Chief or editorial board members are managed by independent editors without their involvement. The journal maintains transparent governance, international editorial oversight, external peer review, and full conflict-of-interest policies, ensuring editorial decisions are based solely on scientific merit.</p>
+          </div>
+        </div>
+
+        <div class="ethics-item">
+          <div class="ethics-item-head" onclick="toggleEthics(this)">
+            <h4>Informed Consent Policy</h4>
+            <svg class="ethics-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="ethics-item-body prose">
+            <p>Authors must obtain written informed consent from all participants before enrollment. Consent must cover participation in the research and, where applicable, publication of identifiable information. The Methods section must include a statement confirming informed consent was obtained. Clinova reserves the right to request copies of signed consent forms at any stage before or after publication.</p>
+          </div>
+        </div>
+
+        <div class="ethics-item">
+          <div class="ethics-item-head" onclick="toggleEthics(this)">
+            <h4>Adherence to COPE Core Practices</h4>
+            <svg class="ethics-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="ethics-item-body prose">
+            <p>We follow COPE's core practices which include: Authorship and contributorship; Complaints and appeals; Conflicts of interest and competing interests; Data and reproducibility; Ethical oversight; Intellectual property; Journal management; Peer review processes; Post-publication discussions and corrections.</p>
+            <p>Complaints may be submitted directly to the Editor-in-Chief at <a href="mailto:editor@clinova.org">editor@clinova.org</a>. Unresolved cases may be referred to COPE.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Open Access -->
+      <section class="about-section" id="oa">
+        <h2 class="section-title">Open Access &amp; Licensing</h2>
+        <div class="prose">
+          <p>Clinova is a fully open-access journal. Manuscripts published are distributed under the terms of the <strong>Creative Commons Attribution-Non Commercial-Share Alike 4.0 License (CC BY-NC-SA 4.0)</strong>, which allows others to remix, transform, and build upon the work non-commercially, as long as appropriate credit is given and new creations are licensed under identical terms.</p>
+          <p>Clinova does not charge article processing fees (APCs). Publication is completely free for all authors.</p>
+          <h3>Archival &amp; Preservation</h3>
+          <p>All published articles are archived in <strong>PORTICO</strong> for long-term digital preservation. All articles are assigned a DOI via CrossRef. We are members of the CrossRef open metadata initiative.</p>
+          <h3>Advertisement Policy</h3>
+          <p>While advertisements help sustain the journal, ethical considerations ensure the integrity and content of the journal are not biased or influenced. The Editorial Board has full and final approval over all advertisement content. Advertisers will never be shown any manuscripts or other content prior to publication.</p>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section class="about-section" id="contact">
+        <h2 class="section-title">Contact Us</h2>
+        <p class="section-subtitle">Reach out for submissions, editorial queries, or partnership enquiries.</p>
+        <div class="contact-grid">
+          <div>
+            <div class="contact-info-item">
+              <div class="contact-info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+              <div class="contact-info-text"><h5>Editorial Office</h5><p><a href="mailto:editor@clinova.org">editor@clinova.org</a></p></div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+              <div class="contact-info-text"><h5>Manuscript Submissions</h5><p><a href="mailto:submissions@clinova.org">submissions@clinova.org</a></p></div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+              <div class="contact-info-text"><h5>Registered Office</h5><p>17-11-16, anandapet 10th lane, Beside Panchavati appartment, ponnur road, <br>Guntur, Andhra Pradesh 522001<br>India</p></div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.06 1.25h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.6a16 16 0 0 0 6.29 6.29l1.62-1.22a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.92 16z"/></svg></div>
+              <div class="contact-info-text"><h5>Publisher Phone</h5><p>+91 9121295507/ 8341824511</p></div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="padding:28px;">
+              <h3 style="font-size:1.2rem;margin-bottom:18px;color:var(--primary-darker);">Send us a message</h3>
+              <form id="contact-form" onsubmit="submitContact(event)">
+                <div class="form-group">
+                  <label class="form-label">Full Name <span class="req">*</span></label>
+                  <input type="text" class="form-input" id="contact-name" placeholder="Dr. Jane Smith" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email Address <span class="req">*</span></label>
+                  <input type="email" class="form-input" id="contact-email" placeholder="jane@university.edu" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Subject <span class="req">*</span></label>
+                  <select class="form-select form-input" id="contact-subject" required>
+                    <option value="">Select a subject…</option>
+                    <option>Manuscript Submission Query</option>
+                    <option>Review Process Query</option>
+                    <option>Editorial Board Inquiry</option>
+                    <option>Technical Support</option>
+                    <option>Partnership / Collaboration</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Message <span class="req">*</span></label>
+                  <textarea class="form-textarea form-input" id="contact-message" placeholder="Write your message here…" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-secondary" style="width:100%;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  Send Message
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="brand"><div class="brand-logo"><svg viewBox="0 0 28 28" fill="none"><path d="M14 3L14 25M7 8L14 3L21 8M7 20L14 25L21 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="14" r="3.5" fill="currentColor" opacity=".8"/></svg></div><div class="brand-text"><span class="brand-title">Clinova</span><span class="brand-subtitle">Multi-disciplinary Research</span></div></div>
+        <p class="footer-tagline">"Advancing knowledge across the frontiers of medicine, technology, and science."</p>
+        <div class="footer-issn"><div><strong>ISSN (Online):</strong> 2984-7310</div><div><strong>ISSN (Print):</strong> 2984-8821</div></div>
+      </div>
+      <div class="footer-col"><h5>Journal</h5><ul><li><a href="index.html">Home</a></li><li><a href="articles.html">All Articles</a></li><li><a href="about.html">About Us</a></li><li><a href="about.html#ethics">Ethical Guidelines</a></li></ul></div>
+      <div class="footer-col"><h5>Authors</h5><ul><li><a href="dashboard.html">Submit Article</a></li><li><a href="dashboard.html">Author Dashboard</a></li><li><a href="about.html#contact">Contact Editors</a></li></ul></div>
+      <div class="footer-col"><h5>Contact</h5><div class="footer-contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>editor@clinova.org</div></div>
+    </div>
+    <div class="footer-bottom"><div>© 2026 Clinova Research Society. Published under CC BY-NC-SA 4.0.</div></div>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+function toggleEthics(head) {
+  const item = head.closest('.ethics-item');
+  item.classList.toggle('open');
+}
+function submitContact(e) {
+  e.preventDefault();
+  showToast('Message Sent', 'Thank you! The editorial office will respond within 2 working days.', 'success');
+  e.target.reset();
+}
+// Highlight active TOC link on scroll
+const sections = document.querySelectorAll('.about-section');
+const tocLinks = document.querySelectorAll('.about-toc-list a');
+window.addEventListener('scroll', () => {
+  let curr = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 130) curr = s.id; });
+  tocLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + curr);
+  });
+});
+</script>
+</body>
+</html>

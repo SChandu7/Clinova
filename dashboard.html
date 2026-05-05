@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Author Dashboard – Clinova Research Journal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    :root { --font-serif:'Playfair Display',Georgia,serif; --font-sans:'DM Sans',-apple-system,sans-serif; }
+    #auth-view { display: flex; }
+    #dashboard-view { display: none; }
+
+    /* Upload progress */
+    .upload-progress {
+      margin-top: 10px;
+      display: none;
+    }
+    .progress-bar-wrap {
+      height: 6px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--gold));
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    .progress-label {
+      font-size: .78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Multi-file list */
+    .multi-file-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .multi-file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: .88rem;
+    }
+    .multi-file-item .mf-icon { color: var(--primary); }
+    .multi-file-item .mf-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+    .multi-file-item .mf-size { color: var(--text-muted); font-size: .75rem; }
+    .multi-file-item .mf-remove { color: var(--danger); width: 28px; height: 28px; border-radius: 6px; display: grid; place-items: center; cursor: pointer; }
+    .multi-file-item .mf-remove:hover { background: var(--danger-bg); }
+
+    /* Notification badge */
+    .notif-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px; height: 18px;
+      background: var(--danger);
+      color: white;
+      border-radius: 50%;
+      font-size: .65rem;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    /* Submission timeline */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .timeline-item {
+      display: flex;
+      gap: 16px;
+      padding-bottom: 20px;
+      position: relative;
+    }
+    .timeline-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 14px;
+      top: 30px;
+      bottom: 0;
+      width: 1px;
+      background: var(--border);
+    }
+    .timeline-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      font-size: .7rem;
+      font-weight: 700;
+      border: 2px solid;
+    }
+    .timeline-dot.done { background: var(--success); border-color: var(--success); color: white; }
+    .timeline-dot.current { background: var(--primary); border-color: var(--primary); color: white; }
+    .timeline-dot.pending { background: var(--bg); border-color: var(--border-dark); color: var(--text-muted); }
+    .timeline-content h5 { margin: 0 0 2px; font-size: .94rem; color: var(--text); }
+    .timeline-content p { margin: 0; font-size: .82rem; color: var(--text-muted); }
+
+    /* Dashboard welcome banner */
+    .dash-welcome {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-darker) 100%);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      color: white;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .dash-welcome::after {
+      content: '✦';
+      position: absolute;
+      right: 24px; top: 16px;
+      font-size: 2rem;
+      color: rgba(201,169,97,.3);
+    }
+    .dash-welcome h2 { color: white; margin: 0 0 4px; font-size: 1.4rem; }
+    .dash-welcome p { color: rgba(255,255,255,.8); margin: 0; font-size: .9rem; }
+
+    /* Step indicators for submit form */
+    .submit-steps {
+      display: flex;
+      gap: 0;
+      margin-bottom: 28px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .submit-step {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      font-size: .86rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg-alt);
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+    .submit-step:last-child { border-right: 0; }
+    .submit-step.active { background: var(--primary-50); color: var(--primary-darker); }
+    .submit-step.done { background: var(--success-bg); color: var(--success); }
+    .submit-step-num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--border-dark);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: .75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .submit-step.active .submit-step-num { background: var(--primary); }
+    .submit-step.done .submit-step-num { background: var(--success); }
+    @media (max-width: 600px) {
+      .submit-steps { flex-direction: column; }
+      .submit-step { border-right: 0; border-bottom: 1px solid var(--border); }
+    }
+
+    /* Password strength */
+    .pw-strength { height: 4px; background: var(--border); border-radius: 999px; margin-top: 6px; overflow: hidden; }
+    .pw-fill { height: 100%; border-radius: 999px; transition: all .3s; }
+  </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="top-bar">
+  <div class="container">
+    <div class="top-bar-inner">
+      <div class="top-bar-text">Clinova Research Journal — Author Portal</div>
+      <div class="top-bar-actions">
+        <a href="index.html" class="top-bar-link">← Back to Journal</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 28 28" fill="none"><path d="M14 3L14 25M7 8L14 3L21 8M7 20L14 25L21 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="14" r="3.5" fill="currentColor" opacity=".8"/><path d="M4 14h5M19 14h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Clinova</span>
+          <span class="brand-subtitle">Multi-disciplinary Research Journal</span>
+        </div>
+      </a>
+      <div id="header-auth-area"></div>
+      <button class="header-mobile-toggle" id="mobile-menu-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<div class="nav-overlay" id="nav-overlay"></div>
+<nav class="main-nav" id="main-nav">
+  <div class="main-nav-mobile-close"><span>Clinova</span><button id="mobile-menu-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <ul class="main-nav-list">
+    <li><a href="index.html" class="main-nav-link">Home</a></li>
+    <li><a href="articles.html" class="main-nav-link">Articles</a></li>
+    <li><a href="about.html" class="main-nav-link">About Us</a></li>
+    <li><a href="about.html#ethics" class="main-nav-link">Ethical Guidelines</a></li>
+    <li><a href="about.html#contact" class="main-nav-link">Contact</a></li>
+    <li><a href="dashboard.html" class="main-nav-link active">Submit Article</a></li>
+  </ul>
+</nav>
+
+<!-- =============== AUTH VIEW =============== -->
+<div id="auth-view">
+  <div class="auth-shell" style="width:100%;">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h2>Author Portal</h2>
+        <p>Login or create an account to submit and track your manuscripts</p>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="auth-body" id="login-form-wrap">
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div id="login-alert"></div>
+          <div class="form-group">
+            <label class="form-label">Email Address <span class="req">*</span></label>
+            <input type="email" class="form-input" id="login-email" placeholder="your@email.com" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password <span class="req">*</span></label>
+            <input type="password" class="form-input" id="login-password" placeholder="Enter your password" required />
+          </div>
+          <button type="submit" class="btn btn-secondary btn-large" id="login-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            Sign In
+          </button>
+        </form>
+        <div class="auth-footer">
+          Don't have an account? <a href="#" onclick="switchTab('register')">Register here</a>
+        </div>
+        <!-- Demo note -->
+        <div style="margin: 0 28px 20px; padding: 12px 14px; background: var(--gold-50); border: 1px solid var(--gold); border-radius: var(--radius); font-size: .82rem; color: var(--primary-darker);">
+          <strong>Demo Login:</strong> demo@clinova.org / demo1234
+        </div>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="auth-body" id="register-form-wrap" style="display:none;">
+        <form id="register-form" onsubmit="handleRegister(event)">
+          <div id="register-alert"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name <span class="req">*</span></label>
+              <input type="text" class="form-input" id="reg-firstname" placeholder="Arjun" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name <span class="req">*</span></label>
+              <input type="text" class="form-input" id="reg-lastname" placeholder="Sharma" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address <span class="req">*</span></label>
+            <input type="email" class="form-input" id="reg-email" placeholder="your@institution.edu" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Institution / Organisation <span class="req">*</span></label>
+            <input type="text" class="form-input" id="reg-institution" placeholder="IIT Madras / AIIMS Delhi" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password <span class="req">*</span></label>
+            <input type="password" class="form-input" id="reg-password" placeholder="Minimum 8 characters" required oninput="checkPasswordStrength(this.value)" />
+            <div class="pw-strength"><div class="pw-fill" id="pw-fill"></div></div>
+            <div class="form-help" id="pw-label">Enter a password</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm Password <span class="req">*</span></label>
+            <input type="password" class="form-input" id="reg-confirm" placeholder="Repeat password" required />
+          </div>
+          <button type="submit" class="btn btn-secondary btn-large" id="reg-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            Create Account
+          </button>
+        </form>
+        <div class="auth-footer">
+          Already have an account? <a href="#" onclick="switchTab('login')">Sign in</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============== DASHBOARD VIEW =============== -->
+<div id="dashboard-view">
+  <div class="page-hero" style="padding:32px 0 26px;">
+    <div class="container page-hero-content">
+      <div class="breadcrumb"><a href="index.html">Home</a><span class="breadcrumb-sep"></span><span>Author Dashboard</span></div>
+      <h1 style="font-size:1.8rem;">Author Dashboard</h1>
+    </div>
+  </div>
+
+  <div class="dashboard">
+    <div class="container">
+      <div class="dashboard-grid">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+          <div class="dashboard-user">
+            <div class="dashboard-avatar" id="dash-avatar">A</div>
+            <p class="dashboard-username" id="dash-name">Author Name</p>
+            <p class="dashboard-email" id="dash-email">email@domain.com</p>
+          </div>
+          <ul class="dashboard-menu">
+            <li><button class="active" onclick="showSection('overview')" data-section="overview">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Overview
+            </button></li>
+            <li><button onclick="showSection('submit')" data-section="submit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Submit New Article
+            </button></li>
+            <li><button onclick="showSection('submissions')" data-section="submissions">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6M9 16h6M9 8h3M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg>
+              My Submissions
+              <span class="notif-badge" id="pending-badge" style="display:none;">0</span>
+            </button></li>
+            <li><button onclick="showSection('profile')" data-section="profile">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              My Profile
+            </button></li>
+            <li style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
+              <button onclick="handleLogout()" style="color:var(--danger);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Sign Out
+              </button>
+            </li>
+          </ul>
+        </aside>
+
+        <!-- Main content -->
+        <main class="dashboard-main">
+
+          <!-- OVERVIEW -->
+          <div class="dashboard-section active" id="section-overview">
+            <div class="dash-welcome">
+              <h2>Welcome back, <span id="dash-welcome-name">Author</span>! 👋</h2>
+              <p>Here's a summary of your manuscript submissions and their current status.</p>
+            </div>
+            <div class="dashboard-stats">
+              <div class="stat-card"><p class="stat-value" id="stat-total-sub">0</p><p class="stat-label">Total Submissions</p></div>
+              <div class="stat-card pending"><p class="stat-value" id="stat-pending">0</p><p class="stat-label">Under Review</p></div>
+              <div class="stat-card approved"><p class="stat-value" id="stat-approved">0</p><p class="stat-label">Approved / Published</p></div>
+              <div class="stat-card rejected"><p class="stat-value" id="stat-rejected">0</p><p class="stat-label">Rejected</p></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+              <h3 style="margin:0;font-size:1.1rem;">Recent Submissions</h3>
+              <button class="btn btn-primary btn-small" onclick="showSection('submit')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Submission
+              </button>
+            </div>
+            <div class="submission-list" id="overview-submission-list">
+              <div class="empty-state" style="padding:36px 0;">
+                <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 12h6M9 16h6M9 8h3M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg></div>
+                <h3>No submissions yet</h3>
+                <p>Start by submitting your first manuscript.</p>
+                <button class="btn btn-secondary" style="margin-top:14px;" onclick="showSection('submit')">Submit Article</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBMIT FORM -->
+          <div class="dashboard-section" id="section-submit">
+            <h2 style="margin-bottom:6px;">Submit New Article</h2>
+            <p style="color:var(--text-muted);margin-bottom:22px;font-size:.94rem;">Fill in the details below and upload your manuscript file(s).</p>
+
+            <div class="submit-steps">
+              <div class="submit-step active" id="step1"><span class="submit-step-num">1</span> Article Info</div>
+              <div class="submit-step" id="step2"><span class="submit-step-num">2</span> Files</div>
+              <div class="submit-step" id="step3"><span class="submit-step-num">3</span> Declaration</div>
+              <div class="submit-step" id="step4"><span class="submit-step-num">4</span> Confirm</div>
+            </div>
+
+            <!-- Step 1: Article Info -->
+            <div id="submit-step1">
+              <form id="submit-form-step1">
+                <div class="form-group">
+                  <label class="form-label">Manuscript Title <span class="req">*</span></label>
+                  <input type="text" class="form-input" id="sub-title" placeholder="Enter the full title of your manuscript" required />
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Article Type <span class="req">*</span></label>
+                    <select class="form-select form-input" id="sub-type" required>
+                      <option value="">Select type…</option>
+                      <option>Original Article</option>
+                      <option>Review Article</option>
+                      <option>Case Report</option>
+                      <option>Technical Communication</option>
+                      <option>Editorial</option>
+                      <option>Conference Abstract</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Discipline <span class="req">*</span></label>
+                    <select class="form-select form-input" id="sub-category" required>
+                      <option value="">Select discipline…</option>
+                      <option value="medical">Medical &amp; Healthcare Sciences</option>
+                      <option value="tech">Engineering &amp; Technology</option>
+                      <option value="science">Natural Sciences</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">All Authors (comma-separated) <span class="req">*</span></label>
+                  <input type="text" class="form-input" id="sub-authors" placeholder="Dr. A. Kumar, Prof. B. Singh, Dr. C. Rao" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Corresponding Author Institution <span class="req">*</span></label>
+                  <input type="text" class="form-input" id="sub-institution" placeholder="University / Hospital / Research Institute" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Abstract <span class="req">*</span></label>
+                  <textarea class="form-textarea form-input" id="sub-abstract" placeholder="Provide a structured abstract (250–400 words) covering Background, Methods, Results, and Conclusion." required></textarea>
+                  <div class="form-help">250–400 words recommended. Structured format preferred.</div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Keywords <span class="req">*</span></label>
+                  <input type="text" class="form-input" id="sub-keywords" placeholder="keyword1, keyword2, keyword3 (3–8 keywords)" required />
+                  <div class="form-help">Enter 3–8 keywords separated by commas.</div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Conflicts of Interest</label>
+                  <textarea class="form-textarea form-input" id="sub-conflicts" placeholder="Declare any financial or non-financial conflicts of interest, or write 'None declared'." style="min-height:70px;"></textarea>
+                </div>
+                <div style="display:flex; justify-content:flex-end;">
+                  <button type="button" class="btn btn-secondary" onclick="goToStep(2)">
+                    Next: Upload Files
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Step 2: Files -->
+            <div id="submit-step2" style="display:none;">
+              <div class="form-group">
+                <label class="form-label">Upload Manuscript Files <span class="req">*</span></label>
+                <div class="form-help" style="margin-bottom:10px;">Accepted formats: PDF, DOCX, DOC, ZIP. Max 50MB per file. You may upload multiple files.</div>
+                <div class="file-drop" id="file-drop-zone" onclick="document.getElementById('file-input').click()">
+                  <div class="file-drop-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  </div>
+                  <p><strong>Click to browse</strong> or drag and drop your files here</p>
+                  <p style="font-size:.8rem;margin-top:6px;color:var(--text-light);">PDF, DOCX, DOC, ZIP — up to 50MB per file</p>
+                </div>
+                <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.zip" style="display:none;" onchange="handleFileSelect(this)" />
+                <div class="multi-file-list" id="selected-files-list"></div>
+                <div class="upload-progress" id="upload-progress">
+                  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill"></div></div>
+                  <div class="progress-label"><span>Uploading…</span><span id="progress-pct">0%</span></div>
+                </div>
+              </div>
+              <div style="display:flex; gap:12px; justify-content:space-between;">
+                <button type="button" class="btn btn-ghost" onclick="goToStep(1)">← Back</button>
+                <button type="button" class="btn btn-secondary" onclick="goToStep(3)">Next: Declaration →</button>
+              </div>
+            </div>
+
+            <!-- Step 3: Declaration -->
+            <div id="submit-step3" style="display:none;">
+              <div class="card" style="padding:24px; margin-bottom:22px; background:var(--bg-alt);">
+                <h3 style="font-size:1.1rem; margin-bottom:14px; color:var(--primary-darker);">Author Declaration</h3>
+                <div style="display:flex;flex-direction:column;gap:14px;">
+                  <label style="display:flex;align-items:flex-start;gap:12px;font-size:.9rem;cursor:pointer;">
+                    <input type="checkbox" id="decl-original" style="margin-top:3px;accent-color:var(--primary);" />
+                    <span>I confirm that this manuscript is original work and has not been published elsewhere, and is not currently under consideration by any other journal.</span>
+                  </label>
+                  <label style="display:flex;align-items:flex-start;gap:12px;font-size:.9rem;cursor:pointer;">
+                    <input type="checkbox" id="decl-ethics" style="margin-top:3px;accent-color:var(--primary);" />
+                    <span>All authors have read and approved the final manuscript. Ethical approval has been obtained where required.</span>
+                  </label>
+                  <label style="display:flex;align-items:flex-start;gap:12px;font-size:.9rem;cursor:pointer;">
+                    <input type="checkbox" id="decl-consent" style="margin-top:3px;accent-color:var(--primary);" />
+                    <span>Written informed consent was obtained from all participants where applicable (for clinical or human-subjects research).</span>
+                  </label>
+                  <label style="display:flex;align-items:flex-start;gap:12px;font-size:.9rem;cursor:pointer;">
+                    <input type="checkbox" id="decl-copyright" style="margin-top:3px;accent-color:var(--primary);" />
+                    <span>I agree to the Clinova open-access publication terms (CC BY-NC-SA 4.0) and transfer of copyright to Clinova Research Society upon acceptance.</span>
+                  </label>
+                  <label style="display:flex;align-items:flex-start;gap:12px;font-size:.9rem;cursor:pointer;">
+                    <input type="checkbox" id="decl-ai" style="margin-top:3px;accent-color:var(--primary);" />
+                    <span>Any use of AI tools in writing, research, or image preparation has been fully disclosed in the manuscript.</span>
+                  </label>
+                </div>
+              </div>
+              <div style="display:flex; gap:12px; justify-content:space-between;">
+                <button type="button" class="btn btn-ghost" onclick="goToStep(2)">← Back</button>
+                <button type="button" class="btn btn-secondary" onclick="goToStep(4)">Review Submission →</button>
+              </div>
+            </div>
+
+            <!-- Step 4: Review & Submit -->
+            <div id="submit-step4" style="display:none;">
+              <h3 style="margin-bottom:16px;font-size:1.1rem;">Review Your Submission</h3>
+              <div class="card" style="padding:22px; margin-bottom:20px;">
+                <div id="submission-review-details" style="display:grid;gap:12px;">
+                </div>
+              </div>
+              <div class="alert alert-info">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div>After submission, you will receive a confirmation email. You can track the review status in <strong>My Submissions</strong>.</div>
+              </div>
+              <div style="display:flex; gap:12px; justify-content:space-between;">
+                <button type="button" class="btn btn-ghost" onclick="goToStep(3)">← Back</button>
+                <button type="button" class="btn btn-primary" id="final-submit-btn" onclick="submitManuscript()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  Submit Manuscript
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- MY SUBMISSIONS -->
+          <div class="dashboard-section" id="section-submissions">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; flex-wrap:wrap; gap:12px;">
+              <h2 style="margin:0;">My Submissions</h2>
+              <button class="btn btn-primary btn-small" onclick="showSection('submit')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Submission
+              </button>
+            </div>
+            <div class="submission-list" id="full-submission-list"></div>
+          </div>
+
+          <!-- PROFILE -->
+          <div class="dashboard-section" id="section-profile">
+            <h2 style="margin-bottom:20px;">My Profile</h2>
+            <form id="profile-form" onsubmit="saveProfile(event)">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">First Name</label>
+                  <input type="text" class="form-input" id="prof-firstname" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Last Name</label>
+                  <input type="text" class="form-input" id="prof-lastname" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-input" id="prof-email" readonly style="background:var(--bg-alt);" />
+                <div class="form-help">Email cannot be changed. Contact support if needed.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Institution / Organisation</label>
+                <input type="text" class="form-input" id="prof-institution" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">ORCID iD</label>
+                <input type="text" class="form-input" id="prof-orcid" placeholder="0000-0000-0000-0000" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Research Interests</label>
+                <textarea class="form-textarea form-input" id="prof-interests" placeholder="e.g., Cardiology, Machine Learning, Genetics…" style="min-height:80px;"></textarea>
+              </div>
+              <button type="submit" class="btn btn-secondary">Save Profile</button>
+            </form>
+          </div>
+
+        </main>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="brand"><div class="brand-logo"><svg viewBox="0 0 28 28" fill="none"><path d="M14 3L14 25M7 8L14 3L21 8M7 20L14 25L21 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="14" r="3.5" fill="currentColor" opacity=".8"/></svg></div><div class="brand-text"><span class="brand-title">Clinova</span><span class="brand-subtitle">Multi-disciplinary Research</span></div></div>
+        <p class="footer-tagline">"Advancing knowledge across the frontiers of medicine, technology, and science."</p>
+        <div class="footer-issn"><div><strong>ISSN (Online):</strong> 2984-7310</div><div><strong>ISSN (Print):</strong> 2984-8821</div></div>
+      </div>
+      <div class="footer-col"><h5>Journal</h5><ul><li><a href="index.html">Home</a></li><li><a href="articles.html">All Articles</a></li><li><a href="about.html">About Us</a></li><li><a href="about.html#ethics">Ethical Guidelines</a></li></ul></div>
+      <div class="footer-col"><h5>Authors</h5><ul><li><a href="dashboard.html">Submit Article</a></li><li><a href="about.html#contact">Contact Editors</a></li></ul></div>
+      <div class="footer-col"><h5>Contact</h5><div class="footer-contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>editor@clinova.org</div></div>
+    </div>
+    <div class="footer-bottom"><div>© 2026 Clinova Research Society. Published under CC BY-NC-SA 4.0.</div></div>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
