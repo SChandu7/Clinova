@@ -50,8 +50,13 @@ async function loadAdminSubmissions() {
   try {
     const res  = await fetch(`${API}/submissions/all/`);
     const json = await res.json();
-    if (json.success) renderAdminSubmissions(json.data);
-  } catch(_) {}
+    console.log('Admin subs:', json); // debug line
+    if (json.success && json.data) {
+      renderAdminSubmissions(Array.isArray(json.data) ? json.data : []);
+    }
+  } catch(e) {
+    console.error('loadAdminSubmissions error:', e);
+  }
 }
 
 function renderAdminSubmissions(subs) {
@@ -98,8 +103,14 @@ function buildAdminSubCard(s) {
       </div>
       <span class="status ${statusMap[s.status] || 'status-pending'}">${s.status}</span>
     </div>
+    ${s.files?.length ? `<div class="submission-files" style="padding:10px 0;">
+      ${s.files.map(f => `<a href="${f.file_url}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:.82rem;padding:4px 10px;background:var(--bg-alt);border:1px solid var(--border);border-radius:999px;color:var(--primary);margin-right:6px;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        ${f.original_name}
+      </a>`).join('')}
+    </div>` : ''}
     <div style="display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);flex-wrap:wrap;">
-      <select onchange="updateSubmissionStatus('${s.submission_id}', this.value)" 
+      <select onchange="updateSubmissionStatus('${s.submission_id}', this.value)"
         style="padding:6px 12px;border-radius:6px;border:1px solid var(--border-dark);font-size:.82rem;background:var(--bg);">
         <option value="pending"   ${s.status==='pending'   ?'selected':''}>Awaiting Review</option>
         <option value="screening" ${s.status==='screening' ?'selected':''}>Editorial Screening</option>
@@ -300,7 +311,14 @@ function showSection(name) {
   const btn     = document.querySelector(`[data-section="${name}"]`);
   if (section) section.classList.add('active');
   if (btn)     btn.classList.add('active');
-  if (name === 'submissions') loadSubmissions();
+
+  // ── ADD THIS ──
+  if (sessionStorage.getItem('clinova_admin')) {
+    loadAdminSubmissions();  // always reload for admin
+  } else {
+    if (name === 'submissions') loadSubmissions();
+  }
+
   if (window.innerWidth <= 900) window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 window.showSection = showSection;
