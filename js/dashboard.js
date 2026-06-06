@@ -1270,3 +1270,5 @@ function showAlert(id, msg, type) {
 /* ---- Utils ---- */
 function setText(id, val)  { const el = document.getElementById(id); if (el) el.textContent = val || ''; }
 function setValue(id, val) { const el = document.getElementById(id); if (el) el.value       = val || ''; }
+
+window.toggleAdminDetails = toggleAdminDetails;
