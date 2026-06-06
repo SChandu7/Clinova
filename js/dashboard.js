@@ -78,40 +78,88 @@ function renderAdminSubmissions(subs) {
     ? subs.map(s => buildAdminSubCard(s)).join('')
     : '<div class="empty-state"><h3>No submissions yet</h3></div>';
 }
+// ================================================================
+//  EDIT INSTRUCTION:
+//  In dashboard.js, REPLACE the buildAdminSubCard() function
+//  with this version — shows all new fields from the 7-step form
+// ================================================================
 
 function buildAdminSubCard(s) {
   const statusMap = {
-    pending:   'status-pending',
-    screening: 'status-review',
-    review:    'status-review',
-    revision:  'status-pending',
-    approved:  'status-approved',
-    published: 'status-published',
-    rejected:  'status-rejected',
+    pending:   { cls:'status-pending',  label:'Awaiting Review' },
+    screening: { cls:'status-review',   label:'Editorial Screening' },
+    review:    { cls:'status-review',   label:'Under Peer Review' },
+    revision:  { cls:'status-pending',  label:'Revision Requested' },
+    approved:  { cls:'status-approved', label:'Accepted' },
+    published: { cls:'status-published',label:'Published' },
+    rejected:  { cls:'status-rejected', label:'Rejected' },
   };
+  const st    = statusMap[s.status] || statusMap.pending;
+  const files = s.files || [];
+
+  // Group files by category
+  const filesByCategory = {};
+  files.forEach(f => {
+    const cat = f.file_category || 'other';
+    if (!filesByCategory[cat]) filesByCategory[cat] = [];
+    filesByCategory[cat].push(f);
+  });
+
+  const fileHtml = Object.entries(filesByCategory).map(([cat, flist]) =>
+    `<div style="margin-bottom:6px;">
+      <span style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">${cat.replace('_',' ')}:</span>
+      ${flist.map(f => `<a href="${f.file_url||'#'}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:.78rem;padding:2px 8px;background:var(--bg-alt);border:1px solid var(--border);border-radius:999px;color:var(--primary);margin-left:5px;margin-bottom:3px;">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>${f.original_name}</a>`).join('')}
+    </div>`
+  ).join('');
+
+  const reviewers = Array.isArray(s.suggested_reviewers) ? s.suggested_reviewers.filter(r => r.name) : [];
+
   return `
-  <div class="submission-item">
+  <div class="submission-item" id="admin-card-${s.submission_id}">
+    <!-- Header -->
     <div class="submission-head">
-      <div>
+      <div style="flex:1;min-width:0;">
         <p class="submission-title">${s.title}</p>
         <div class="submission-meta">
           <span><strong>ID:</strong> ${s.submission_id}</span>
           <span><strong>Author:</strong> ${s.author_name || '—'}</span>
           <span><strong>Type:</strong> ${s.article_type}</span>
-          <span><strong>Date:</strong> ${s.submitted_at?.slice(0,10) || '—'}</span>
+          <span><strong>Subspecialty:</strong> ${s.subspecialty || '—'}</span>
+          <span><strong>Submitted:</strong> ${s.submitted_at?.slice(0,10) || '—'}</span>
         </div>
       </div>
-      <span class="status ${statusMap[s.status] || 'status-pending'}">${s.status}</span>
+      <span class="status ${st.cls}">${st.label}</span>
     </div>
-    ${s.files?.length ? `<div class="submission-files" style="padding:10px 0;">
-      ${s.files.map(f => `<a href="${f.file_url}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:.82rem;padding:4px 10px;background:var(--bg-alt);border:1px solid var(--border);border-radius:999px;color:var(--primary);margin-right:6px;">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        ${f.original_name}
-      </a>`).join('')}
-    </div>` : ''}
-    <div style="display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);flex-wrap:wrap;">
+
+    <!-- Expandable details -->
+    <div id="details-${s.submission_id}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:.84rem;margin-bottom:12px;">
+        <div><strong style="color:var(--text-muted);font-size:.75rem;text-transform:uppercase;">Abstract</strong><p style="margin:4px 0;color:var(--text-secondary);line-height:1.5;font-size:.84rem;">${(s.abstract||'').slice(0,300)}${(s.abstract||'').length>300?'…':''}</p></div>
+        <div>
+          <div style="margin-bottom:6px;"><strong style="color:var(--text-muted);font-size:.75rem;text-transform:uppercase;">Keywords</strong><p style="margin:3px 0;font-size:.84rem;">${s.keywords||'—'}</p></div>
+          <div style="margin-bottom:6px;"><strong style="color:var(--text-muted);font-size:.75rem;text-transform:uppercase;">Conflict of Interest</strong><p style="margin:3px 0;font-size:.84rem;">${s.conflict_of_interest||'—'}</p></div>
+          <div style="margin-bottom:6px;"><strong style="color:var(--text-muted);font-size:.75rem;text-transform:uppercase;">AI Used</strong><p style="margin:3px 0;font-size:.84rem;">${s.ai_used||'—'}</p></div>
+          <div><strong style="color:var(--text-muted);font-size:.75rem;text-transform:uppercase;">Figures / Tables</strong><p style="margin:3px 0;font-size:.84rem;">${s.num_figures||0} figures · ${s.num_tables||0} tables</p></div>
+        </div>
+      </div>
+
+      ${files.length ? `<div style="margin-bottom:10px;"><strong style="color:var(--text-muted);font-size:.75rem;text-transform:uppercase;display:block;margin-bottom:6px;">Uploaded Files</strong>${fileHtml}</div>` : ''}
+
+      ${reviewers.length ? `<div style="margin-bottom:10px;">
+        <strong style="color:var(--text-muted);font-size:.75rem;text-transform:uppercase;display:block;margin-bottom:6px;">Suggested Reviewers</strong>
+        ${reviewers.map((r,i) => `<div style="font-size:.83rem;padding:5px 0;border-bottom:1px dashed var(--border);">${i+1}. <strong>${r.name||'—'}</strong> — ${r.institution||'—'} — ${r.email||'—'} <em style="color:var(--text-muted);">(${r.expertise||''})</em></div>`).join('')}
+      </div>` : ''}
+    </div>
+
+    <!-- Action bar -->
+    <div style="display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--border);flex-wrap:wrap;align-items:center;">
+      <button onclick="toggleAdminDetails('${s.submission_id}')" class="btn btn-ghost btn-small">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Details
+      </button>
       <select onchange="updateSubmissionStatus('${s.submission_id}', this.value)"
-        style="padding:6px 12px;border-radius:6px;border:1px solid var(--border-dark);font-size:.82rem;background:var(--bg);">
+        style="padding:6px 12px;border-radius:6px;border:1px solid var(--border-dark);font-size:.82rem;background:var(--bg);font-family:var(--font-sans);">
         <option value="pending"   ${s.status==='pending'   ?'selected':''}>Awaiting Review</option>
         <option value="screening" ${s.status==='screening' ?'selected':''}>Editorial Screening</option>
         <option value="review"    ${s.status==='review'    ?'selected':''}>Under Peer Review</option>
@@ -120,11 +168,134 @@ function buildAdminSubCard(s) {
         <option value="published" ${s.status==='published' ?'selected':''}>Published</option>
         <option value="rejected"  ${s.status==='rejected'  ?'selected':''}>Rejected</option>
       </select>
-      <button class="btn btn-secondary btn-small" onclick="updateSubmissionStatus('${s.submission_id}', 'approved')">✓ Accept</button>
-      <button class="btn btn-ghost btn-small" style="color:var(--danger);border-color:var(--danger);" onclick="updateSubmissionStatus('${s.submission_id}', 'rejected')">✗ Reject</button>
+      <button class="btn btn-secondary btn-small" onclick="updateSubmissionStatus('${s.submission_id}','approved')">✓ Accept</button>
+      <button class="btn btn-ghost btn-small" style="color:var(--danger);border-color:var(--danger);" onclick="updateSubmissionStatus('${s.submission_id}','rejected')">✗ Reject</button>
     </div>
+
+    ${s.review_note ? `<div class="submission-review" style="margin-top:8px;"><strong>Editor's Note:</strong> ${s.review_note}</div>` : ''}
   </div>`;
 }
+
+function toggleAdminDetails(subId) {
+  const el = document.getElementById('details-' + subId);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+window.toggleAdminDetails = toggleAdminDetails;
+
+
+// ================================================================
+//  EDIT: Also update buildSubmissionCard() for USER side
+//  REPLACE the existing buildSubmissionCard() with this version
+//  which shows the resubmit button if rejected
+// ================================================================
+
+function buildSubmissionCard(s, showTimeline = false) {
+  const statusMap = {
+    pending:   { cls: 'status-pending',  label: 'Submitted — Awaiting Review' },
+    screening: { cls: 'status-review',   label: 'Editorial Screening' },
+    review:    { cls: 'status-review',   label: 'Under Peer Review' },
+    revision:  { cls: 'status-pending',  label: 'Revision Requested' },
+    approved:  { cls: 'status-approved', label: 'Accepted for Publication' },
+    rejected:  { cls: 'status-rejected', label: 'Not Accepted' },
+    published: { cls: 'status-published',label: 'Published' },
+  };
+  const st    = statusMap[s.status] || statusMap.pending;
+  const files = Array.isArray(s.files) ? s.files : [];
+
+  let timelineHtml = '';
+  if (showTimeline) {
+    const stages = [
+      { label: 'Submitted',   done: true },
+      { label: 'Screening',   done: ['screening','review','revision','approved','published','rejected'].includes(s.status) },
+      { label: 'Peer Review', done: ['approved','published','rejected'].includes(s.status), current: s.status==='review' },
+      { label: 'Decision',    done: ['approved','published','rejected'].includes(s.status) },
+      { label: 'Published',   done: s.status==='published' },
+    ];
+    timelineHtml = `<div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);">
+      <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:12px;">Review Progress</div>
+      <div style="display:flex;gap:0;flex-wrap:wrap;">
+        ${stages.map((st2, i) => `
+          <div style="flex:1;min-width:80px;text-align:center;position:relative;padding-top:24px;">
+            <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;border:2px solid ${st2.done?'var(--success)':st2.current?'var(--primary)':'var(--border-dark)'};background:${st2.done?'var(--success)':st2.current?'var(--primary)':'var(--bg)'};display:grid;place-items:center;">
+              ${st2.done?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>':''}
+            </div>
+            ${i<stages.length-1?`<div style="position:absolute;top:9px;left:calc(50% + 10px);right:0;height:2px;background:${st2.done?'var(--success)':'var(--border)'};"></div>`:''}
+            <span style="font-size:.72rem;color:var(--text-muted);display:block;">${st2.label}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  // Resubmit button for rejected
+  const resubmitBtn = s.status === 'rejected' ? `
+    <div style="margin-top:12px;padding:12px 14px;background:var(--danger-bg);border:1px solid var(--danger);border-radius:var(--radius);">
+      <p style="margin:0 0 8px;font-size:.86rem;color:var(--danger);font-weight:600;">This manuscript was not accepted.</p>
+      ${s.reviewNote ? `<p style="margin:0 0 8px;font-size:.84rem;color:var(--text-secondary);">Editor's note: ${s.reviewNote}</p>` : ''}
+      <button class="btn btn-secondary btn-small" onclick="resubmitManuscript('${s.id||s.submission_id}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+        Resubmit with Edits
+      </button>
+    </div>` : '';
+
+  return `
+  <div class="submission-item">
+    <div class="submission-head">
+      <div>
+        <p class="submission-title">${s.title}</p>
+        <div class="submission-meta">
+          <span><strong>ID:</strong> ${s.id||s.submission_id||'—'}</span>
+          <span><strong>Type:</strong> ${s.type||s.article_type||'—'}</span>
+          <span><strong>Subspecialty:</strong> ${s.subspecialty||'—'}</span>
+          <span><strong>Submitted:</strong> ${s.date||s.submitted_at?.slice(0,10)||'—'}</span>
+        </div>
+      </div>
+      <span class="status ${st.cls}">${st.label}</span>
+    </div>
+    ${files.length ? `<div class="submission-files">
+      ${files.map(f => `<span style="display:inline-flex;align-items:center;gap:5px;font-size:.78rem;padding:3px 9px;background:var(--bg-alt);border:1px solid var(--border);border-radius:999px;color:var(--text-secondary);">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        ${typeof f === 'string' ? f : f.original_name}
+      </span>`).join('')}
+    </div>` : ''}
+    ${s.reviewNote && s.status !== 'rejected' ? `<div class="submission-review"><strong>Editor's Note:</strong> ${s.reviewNote}</div>` : ''}
+    ${resubmitBtn}
+    ${timelineHtml}
+  </div>`;
+}
+
+// ── Resubmit with pre-filled data ─────────────────────────────
+function resubmitManuscript(subId) {
+  // Find submission in local data or backend data
+  const subs = getLocalSubmissions();
+  const sub  = subs.find(s => (s.id === subId || s.submission_id === subId));
+
+  showSection('submit');
+
+  // Show disclaimer first then pre-fill after agree
+  window._resubmitData = sub;
+  showToast('Resubmit', 'Complete the disclaimer then your previous details will be pre-filled.', 'success');
+}
+
+// Modified agreeDisclaimer to handle resubmit pre-fill
+const _origAgreeDisclaimer = window.agreeDisclaimer;
+window.agreeDisclaimer = function() {
+  document.getElementById('sub-disclaimer-screen').style.display = 'none';
+  document.getElementById('sub-wizard-screen').style.display     = 'block';
+  initAuthorTable();
+  addReviewerRow();
+
+  // Pre-fill if resubmitting
+  if (window._resubmitData) {
+    const d = window._resubmitData;
+    if (d.title)       { const el = document.getElementById('s2-title');        if (el) { el.value = d.title;       updateCounter('s2-title','s2-title-count','s2-title-words',250); } }
+    if (d.article_type){ const el = document.getElementById('s1-article-type'); if (el) el.value = d.article_type; }
+    if (d.subspecialty){ const el = document.getElementById('s1-subspecialty'); if (el) el.value = d.subspecialty; }
+    if (d.abstract)    { const el = document.getElementById('s2-abstract');     if (el) { el.value = d.abstract;    updateAbstractCounter(); } }
+    if (d.keywords)    { keywords = d.keywords.split(',').map(k=>k.trim()).filter(Boolean); renderKeywordTags(); }
+    showToast('Pre-filled', 'Previous submission details have been loaded. Please make your edits.', 'success');
+    window._resubmitData = null;
+  }
+};
 
 async function updateSubmissionStatus(subId, status) {
   try {
@@ -467,179 +638,540 @@ function updateStats(subs) {
 }
 
 /* ---- Submit form steps ---- */
-function goToStep(n) {
-  if (n > 1) {
-    const title    = document.getElementById('sub-title')?.value.trim();
-    const type     = document.getElementById('sub-type')?.value;
-    const category = document.getElementById('sub-category')?.value;
-    const authors  = document.getElementById('sub-authors')?.value.trim();
-    const abstract = document.getElementById('sub-abstract')?.value.trim();
-    const keywords = document.getElementById('sub-keywords')?.value.trim();
-    if (!title || !type || !category || !authors || !abstract || !keywords) {
-      showToast('Missing fields', 'Please fill all required fields.', 'error');
-      goToStepUI(1); return;
-    }
-  }
-  if (n > 2 && selectedFiles.length === 0) {
-    showToast('No files', 'Please upload at least one file.', 'error'); return;
-  }
-  if (n > 3) {
-    const allOk = ['decl-original','decl-ethics','decl-consent','decl-copyright','decl-ai']
-      .every(id => document.getElementById(id)?.checked);
-    if (!allOk) { showToast('Declaration required', 'Please check all declaration boxes.', 'error'); return; }
-    populateReviewDetails();
-  }
-  goToStepUI(n);
-}
+
 window.goToStep = goToStep;
+// ================================================================
+//  EDIT INSTRUCTION FOR dashboard.js:
+//
+//  1. DELETE these old functions entirely:
+//     - goToStep()
+//     - goToStepUI()
+//     - populateReviewDetails()
+//     - submitManuscript()
+//     - showUploadProgress()
+//     - handleFileSelect()
+//     - renderSelectedFiles()
+//     - removeFile()
+//     - formatBytes()
+//     - (drag/drop zone block for #file-drop-zone)
+//
+//  2. PASTE this entire block in their place.
+// ================================================================
 
-function goToStepUI(n) {
-  currentStep = n;
-  for (let i = 1; i <= 4; i++) {
-    const panel = document.getElementById('submit-step' + i);
-    const step  = document.getElementById('step' + i);
-    if (panel) panel.style.display = (i === n) ? 'block' : 'none';
-    if (step) {
-      step.classList.toggle('active', i === n);
-      step.classList.toggle('done',   i < n);
-    }
+// ── Submission wizard state ────────────────────────────────────
+let subCurrentStep  = 1;
+const SUB_TOTAL_STEPS = 7; // steps 1-7, then step 8 = final review
+
+// All uploaded files keyed by category
+const subFiles = {
+  cover_letter:  [],
+  manuscript:    [],
+  figure:        [],
+  supplementary: [],
+  guideline:     [],
+  copyright:     [],
+  disclosure:    [],
+  other:         [],
+};
+
+// Author rows state
+let authorRows = [];
+let reviewerRows = [];
+
+// Keywords
+let keywords = [];
+
+// ── Disclaimer ────────────────────────────────────────────────
+function agreeDisclaimer() {
+  document.getElementById('sub-disclaimer-screen').style.display = 'none';
+  document.getElementById('sub-wizard-screen').style.display     = 'block';
+  initAuthorTable();
+  addReviewerRow(); // start with one reviewer row
+}
+
+// ── Step navigation ───────────────────────────────────────────
+function subNext() {
+  if (!validateSubStep(subCurrentStep)) return;
+  if (subCurrentStep === SUB_TOTAL_STEPS) {
+    // Show final review
+    buildFinalReview();
+    goToSubStep(8);
+  } else {
+    goToSubStep(subCurrentStep + 1);
   }
 }
 
-function populateReviewDetails() {
-  const el = document.getElementById('submission-review-details');
+function subPrev() {
+  if (subCurrentStep <= 1) return;
+  if (subCurrentStep === 8) {
+    goToSubStep(SUB_TOTAL_STEPS);
+  } else {
+    goToSubStep(subCurrentStep - 1);
+  }
+}
+
+function goToSubStep(n) {
+  // Hide all panels
+  document.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
+  // Show target panel
+  const panel = document.getElementById('sub-panel-' + n);
+  if (panel) panel.classList.add('active');
+
+  // Update sidebar (only for steps 1-7)
+  for (let i = 1; i <= SUB_TOTAL_STEPS; i++) {
+    const item = document.getElementById('sub-sidebar-' + i);
+    if (!item) continue;
+    item.className = 'sub-step-item ' + (
+      i === n   ? 'active'   :
+      i < n     ? 'done'     :
+                  'inactive'
+    );
+  }
+
+  subCurrentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Validation per step ────────────────────────────────────────
+function validateSubStep(step) {
+  if (step === 1) {
+    const type = document.getElementById('s1-article-type')?.value;
+    const spec = document.getElementById('s1-subspecialty')?.value;
+    if (!type) { showToast('Required', 'Please select an Article Type.', 'error'); return false; }
+    if (!spec) { showToast('Required', 'Please select a Subspeciality.', 'error'); return false; }
+  }
+  if (step === 2) {
+    const title = document.getElementById('s2-title')?.value.trim();
+    const abs   = document.getElementById('s2-abstract')?.value.trim();
+    if (!title) { showToast('Required', 'Please enter the Article Title.', 'error'); return false; }
+    if (!abs)   { showToast('Required', 'Please enter the Abstract.', 'error'); return false; }
+  }
+  if (step === 3) {
+    const rows = document.querySelectorAll('#author-table-body tr');
+    if (!rows.length) { showToast('Required', 'Please add at least one author.', 'error'); return false; }
+  }
+  if (step === 4) {
+    const mFiles = subFiles.manuscript;
+    if (!mFiles.length) { showToast('Required', 'Please upload the Main Manuscript file.', 'error'); return false; }
+  }
+  return true;
+}
+
+// ── Author table ──────────────────────────────────────────────
+function initAuthorTable() {
+  // Pre-fill with logged-in user
+  const session = getSession();
+  if (!session) return;
+  const nameParts = (session.firstName + ' ' + session.lastName).split(' ');
+  authorRows = [{
+    firstName: nameParts[0] || '',
+    lastName:  nameParts.slice(1).join(' ') || '',
+    email:     session.email || '',
+    sequence:  'Unselected',
+    corresponding: true,
+    editorial: false,
+  }];
+  renderAuthorTable();
+}
+
+function addAuthorRow() {
+  authorRows.push({ firstName:'', lastName:'', email:'', sequence:'Unselected', corresponding:false, editorial:false });
+  renderAuthorTable();
+}
+
+function removeAuthorRow(idx) {
+  if (authorRows.length <= 1) { showToast('Error', 'At least one author is required.', 'error'); return; }
+  authorRows.splice(idx, 1);
+  renderAuthorTable();
+}
+
+function renderAuthorTable() {
+  const tbody = document.getElementById('author-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = authorRows.map((a, i) => `
+    <tr>
+      <td style="text-align:center;font-weight:600;">${i+1}</td>
+      <td><input type="text" value="${escHtml(a.firstName)}" onchange="updateAuthor(${i},'firstName',this.value)" placeholder="First Name"/></td>
+      <td><input type="text" value="${escHtml(a.lastName)}"  onchange="updateAuthor(${i},'lastName',this.value)"  placeholder="Last Name"/></td>
+      <td><input type="email" value="${escHtml(a.email)}"    onchange="updateAuthor(${i},'email',this.value)"     placeholder="Email"/></td>
+      <td>
+        <select onchange="updateAuthor(${i},'sequence',this.value)">
+          ${['Unselected','First Author','Second Author','Third Author','Fourth Author','Fifth Author','Sixth Author','Other']
+            .map(s => `<option${s===a.sequence?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td style="text-align:center;"><input type="radio" name="corresponding-author" ${a.corresponding?'checked':''} onchange="setCorresponding(${i})"/></td>
+      <td style="text-align:center;"><input type="checkbox" ${a.editorial?'checked':''} onchange="updateAuthor(${i},'editorial',this.checked)"/></td>
+      <td style="text-align:center;">
+        <button onclick="removeAuthorRow(${i})" style="color:var(--danger);padding:4px 8px;border-radius:4px;font-size:.8rem;" title="Remove">✕</button>
+      </td>
+    </tr>`).join('');
+  updateCitePreview();
+}
+
+function updateAuthor(idx, field, val) {
+  authorRows[idx][field] = val;
+  updateCitePreview();
+}
+
+function setCorresponding(idx) {
+  authorRows.forEach((a, i) => a.corresponding = (i === idx));
+  renderAuthorTable();
+}
+
+function updateCitePreview() {
+  const el = document.getElementById('cite-preview-text');
   if (!el) return;
-  const rows = [
-    ['Title',       document.getElementById('sub-title')?.value],
-    ['Type',        document.getElementById('sub-type')?.value],
-    ['Discipline',  document.getElementById('sub-category')?.value],
-    ['Authors',     document.getElementById('sub-authors')?.value],
-    ['Institution', document.getElementById('sub-institution')?.value],
-    ['Keywords',    document.getElementById('sub-keywords')?.value],
-    ['Files',       selectedFiles.map(f => f.name).join(', ') || '—'],
-  ];
-  el.innerHTML = rows.map(([label, val]) => `
-    <div style="display:flex;gap:12px;font-size:.9rem;border-bottom:1px solid var(--border);padding-bottom:10px;">
-      <strong style="min-width:100px;color:var(--text-muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;">${label}</strong>
-      <span>${val || '—'}</span>
-    </div>`).join('');
+  const title = document.getElementById('s2-title')?.value.trim() || '…';
+  const shown = authorRows.slice(0, 6);
+  const authStr = shown.map(a => {
+    const sn = a.lastName || '?';
+    const initials = (a.firstName || '').split(' ').map(w => w[0] || '').join('').toUpperCase();
+    return `<span class="cite-author">${sn} ${initials}</span>`;
+  }).join(', ') + (authorRows.length > 6 ? ' <em>et al.</em>' : '');
+  el.innerHTML = `${authStr}. <span class="cite-title">${escHtml(title)}</span>`;
 }
 
-/* ---- Final submit — POST with token ---- */
-async function submitManuscript() {
-  const btn = document.getElementById('final-submit-btn');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Submitting…'; }
-
-  const localEntry = {
-    id:          'CRJ-' + Date.now().toString().slice(-6),
-    email:       currentUser?.email,
-    title:       document.getElementById('sub-title')?.value.trim(),
-    type:        document.getElementById('sub-type')?.value,
-    category:    document.getElementById('sub-category')?.value,
-    authors:     document.getElementById('sub-authors')?.value.trim(),
-    institution: document.getElementById('sub-institution')?.value.trim(),
-    abstract:    document.getElementById('sub-abstract')?.value.trim(),
-    keywords:    document.getElementById('sub-keywords')?.value.trim(),
-    files:       selectedFiles.map(f => f.name),
-    status:      'pending',
-    date:        new Date().toLocaleDateString('en-IN'),
-    reviewNote:  '',
-  };
-
-  showUploadProgress(async () => {
-    // Save locally first
-    const subs = getLocalSubmissions();
-    subs.push(localEntry);
-    saveLocalSubmissions(subs);
-
-    // POST to backend with token
-    const session = getSession();
-    try {
-      const formData = new FormData();
-      formData.append('title',          localEntry.title);
-      formData.append('article_type',   localEntry.type);
-      formData.append('category',       localEntry.category);
-      formData.append('authors',        localEntry.authors);
-      formData.append('institution',    localEntry.institution || '');
-      formData.append('abstract',       localEntry.abstract);
-      formData.append('keywords',       localEntry.keywords || '');
-      formData.append('conflicts',      document.getElementById('sub-conflicts')?.value || 'None declared');
-      formData.append('decl_original',  document.getElementById('decl-original')?.checked  ? 'true' : 'false');
-      formData.append('decl_ethics',    document.getElementById('decl-ethics')?.checked    ? 'true' : 'false');
-      formData.append('decl_consent',   document.getElementById('decl-consent')?.checked   ? 'true' : 'false');
-      formData.append('decl_copyright', document.getElementById('decl-copyright')?.checked ? 'true' : 'false');
-      formData.append('decl_ai',        document.getElementById('decl-ai')?.checked        ? 'true' : 'false');
-      selectedFiles.forEach(f => formData.append('files', f));
-
-      await fetch(`${API}/submissions/`, {
-        method:  'POST',
-        headers: { 'Authorization': `Token ${session?.token}` },
-        body:    formData,
-      });
-    } catch (_) {}
-
-    // Reset
-    selectedFiles = [];
-    document.getElementById('selected-files-list').innerHTML = '';
-    document.querySelectorAll('#section-submit input[type="text"], #section-submit textarea, #section-submit select').forEach(el => el.value = '');
-    document.querySelectorAll('#section-submit input[type="checkbox"]').forEach(el => el.checked = false);
-    goToStepUI(1);
-    if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Submit Manuscript'; }
-
-    showToast('Submitted!', `"${localEntry.title.slice(0,50)}…" received.`, 'success');
-    showSection('submissions');
-    loadSubmissions();
-  });
+// ── Reviewer table ─────────────────────────────────────────────
+function addReviewerRow() {
+  if (reviewerRows.length >= 3) { showToast('Limit', 'You may suggest up to 3 reviewers.', 'error'); return; }
+  reviewerRows.push({ name:'', institution:'', email:'', expertise:'' });
+  renderReviewerTable();
 }
-window.submitManuscript = submitManuscript;
 
-function showUploadProgress(callback) {
-  const bar  = document.getElementById('upload-progress');
-  const fill = document.getElementById('progress-fill');
-  const pct  = document.getElementById('progress-pct');
-  if (bar) bar.style.display = 'block';
-  let p = 0;
-  const iv = setInterval(() => {
-    p = Math.min(p + Math.random() * 20 + 8, 98);
-    if (fill) fill.style.width = p + '%';
-    if (pct)  pct.textContent  = Math.round(p) + '%';
-    if (p >= 98) {
-      clearInterval(iv);
-      if (fill) fill.style.width = '100%';
-      if (pct)  pct.textContent  = '100%';
-      if (bar)  setTimeout(() => bar.style.display = 'none', 400);
-      setTimeout(callback, 500);
+function removeReviewerRow(idx) {
+  reviewerRows.splice(idx, 1);
+  renderReviewerTable();
+}
+
+function renderReviewerTable() {
+  const tbody = document.getElementById('reviewer-table-body');
+  if (!tbody) return;
+  if (!reviewerRows.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:18px;color:var(--text-muted);font-size:.86rem;">No reviewers added. You may skip this step.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = reviewerRows.map((r, i) => `
+    <tr>
+      <td style="text-align:center;font-weight:600;">${i+1}</td>
+      <td><input type="text" value="${escHtml(r.name)}"        onchange="reviewerRows[${i}].name=this.value"        placeholder="Full Name"/></td>
+      <td><input type="text" value="${escHtml(r.institution)}" onchange="reviewerRows[${i}].institution=this.value" placeholder="Institution"/></td>
+      <td><input type="email" value="${escHtml(r.email)}"      onchange="reviewerRows[${i}].email=this.value"       placeholder="Email"/></td>
+      <td><input type="text" value="${escHtml(r.expertise)}"   onchange="reviewerRows[${i}].expertise=this.value"   placeholder="Area of expertise"/></td>
+      <td style="text-align:center;"><button onclick="removeReviewerRow(${i})" style="color:var(--danger);">✕</button></td>
+    </tr>`).join('');
+}
+
+// ── File upload handling ──────────────────────────────────────
+function triggerFileInput(inputId) {
+  document.getElementById(inputId)?.click();
+}
+
+function handleFUZ(input, listId, category) {
+  const newFiles = [...(input.files || [])];
+  newFiles.forEach(f => {
+    if (!subFiles[category].find(x => x.name === f.name)) {
+      subFiles[category].push(f);
     }
-  }, 100);
-}
-
-/* ---- File handling ---- */
-function handleFileSelect(input) {
-  [...(input.files || [])].forEach(f => {
-    if (!selectedFiles.find(x => x.name === f.name)) selectedFiles.push(f);
   });
-  renderSelectedFiles();
+  renderFUZ(listId, category);
   input.value = '';
 }
-window.handleFileSelect = handleFileSelect;
 
-function renderSelectedFiles() {
-  const list = document.getElementById('selected-files-list');
-  if (!list) return;
-  list.innerHTML = selectedFiles.map((f, i) => `
-    <div class="multi-file-item">
-      <span class="mf-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
-      <span class="mf-name">${f.name}</span>
-      <span class="mf-size">${formatBytes(f.size)}</span>
-      <span class="mf-remove" onclick="removeFile(${i})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+function renderFUZ(listId, category) {
+  const el = document.getElementById(listId);
+  if (!el) return;
+  const files = subFiles[category] || [];
+  if (!files.length) { el.innerHTML = ''; return; }
+  el.innerHTML = files.map((f, i) => `
+    <div class="fuz-file-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span class="fuz-fn">${escHtml(f.name)}</span>
+      <span class="fuz-sz">${formatFileSize(f.size)}</span>
+      <button onclick="removeFUZFile('${category}',${i},'${listId}')" title="Remove">✕</button>
     </div>`).join('');
 }
-function removeFile(i) { selectedFiles.splice(i, 1); renderSelectedFiles(); }
-window.removeFile = removeFile;
-function formatBytes(b) {
-  if (b < 1024) return b + ' B';
-  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+
+function removeFUZFile(category, idx, listId) {
+  subFiles[category].splice(idx, 1);
+  renderFUZ(listId, category);
+}
+
+function formatFileSize(b) {
+  if (b < 1024)       return b + ' B';
+  if (b < 1048576)    return (b/1024).toFixed(1) + ' KB';
   return (b/1048576).toFixed(1) + ' MB';
+}
+
+// ── Keyword handling ──────────────────────────────────────────
+function handleKeywordInput(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = e.target.value.trim().replace(/,$/, '');
+    if (!val) return;
+    if (keywords.length >= 5) { showToast('Limit', 'Maximum 5 keywords allowed.', 'error'); return; }
+    if (!keywords.includes(val)) {
+      keywords.push(val);
+      renderKeywordTags();
+    }
+    e.target.value = '';
+  } else if (e.key === 'Backspace' && !e.target.value && keywords.length) {
+    keywords.pop();
+    renderKeywordTags();
+  }
+}
+
+function removeKeyword(idx) {
+  keywords.splice(idx, 1);
+  renderKeywordTags();
+}
+
+function renderKeywordTags() {
+  const container = document.getElementById('kw-tags-container');
+  const input = document.getElementById('kw-input');
+  if (!container || !input) return;
+  // Remove old tags
+  container.querySelectorAll('.keyword-tag').forEach(t => t.remove());
+  // Insert tags before input
+  keywords.forEach((kw, i) => {
+    const tag = document.createElement('span');
+    tag.className = 'keyword-tag';
+    tag.innerHTML = `${escHtml(kw)} <button onclick="removeKeyword(${i})" type="button">×</button>`;
+    container.insertBefore(tag, input);
+  });
+  const counter = document.getElementById('s2-kw-count');
+  if (counter) counter.textContent = keywords.length;
+}
+
+// ── Character / word counters ─────────────────────────────────
+function updateCounter(inputId, charId, wordId, max) {
+  const val = document.getElementById(inputId)?.value || '';
+  const chars = val.length;
+  const words = val.trim() ? val.trim().split(/\s+/).length : 0;
+  const charEl = document.getElementById(charId);
+  const wordEl = document.getElementById(wordId);
+  if (charEl) charEl.textContent = chars;
+  if (wordEl) wordEl.textContent = words;
+  if (charEl) charEl.style.color = chars > max ? 'var(--danger)' : '';
+}
+
+function updateCounterInput(inputId, charId, wordId, max) {
+  updateCounter(inputId, charId, wordId, max);
+}
+
+function updateAbstractCounter() {
+  const val = document.getElementById('s2-abstract')?.value || '';
+  const charEl = document.getElementById('s2-abs-chars');
+  const wordEl = document.getElementById('s2-abs-words');
+  if (charEl) charEl.textContent = val.length;
+  if (wordEl) wordEl.textContent = val.trim() ? val.trim().split(/\s+/).length : 0;
+}
+
+// ── Radio inline styling ──────────────────────────────────────
+function toggleCOI(input) {
+  document.querySelectorAll('.radio-inline label').forEach(l => l.classList.remove('selected'));
+  input.closest('label').classList.add('selected');
+  const wrap = document.getElementById('coi-details-wrap');
+  if (wrap) wrap.style.display = input.value === 'yes' ? 'block' : 'none';
+}
+
+function styleRadioInline(input) {
+  const group = input.closest('.radio-inline');
+  if (!group) return;
+  group.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
+  input.closest('label').classList.add('selected');
+}
+
+// ── Build final review ────────────────────────────────────────
+function buildFinalReview() {
+  const el = document.getElementById('final-review-content');
+  if (!el) return;
+
+  const getVal = id => document.getElementById(id)?.value || '—';
+  const getRadio = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '—';
+
+  const authorList = authorRows.map((a,i) =>
+    `${i+1}. ${a.firstName} ${a.lastName} &lt;${a.email}&gt;${a.corresponding?' (Corresponding)':''}`
+  ).join('<br>');
+
+  const reviewerList = reviewerRows.filter(r => r.name).map((r,i) =>
+    `${i+1}. ${r.name} — ${r.institution} — ${r.email}`
+  ).join('<br>') || '—';
+
+  const allFiles = Object.entries(subFiles)
+    .flatMap(([cat, files]) => files.map(f => `${f.name} (${cat.replace('_',' ')})`))
+    .join('<br>') || '—';
+
+  el.innerHTML = `
+    <div class="final-review-block">
+      <div class="final-review-block-head">1. Article Type &amp; Subspecialty</div>
+      <div class="final-review-row"><strong>Article Type</strong><span>${getVal('s1-article-type')}</span></div>
+      <div class="final-review-row"><strong>Subspecialty</strong><span>${getVal('s1-subspecialty')}</span></div>
+      <div class="final-review-row"><strong>CTR Number</strong><span>${getVal('s1-ctr') || 'N/A'}</span></div>
+      <div class="final-review-row"><strong>Conflict of Interest</strong><span>${getRadio('coi')}</span></div>
+      <div class="final-review-row"><strong>Financial Support</strong><span>${getVal('s1-financial')}</span></div>
+      <div class="final-review-row"><strong>Patient Consent</strong><span>${getRadio('patient-consent')}</span></div>
+      <div class="final-review-row"><strong>IRB Permission</strong><span>${getRadio('irb')}</span></div>
+      <div class="final-review-row"><strong>AI Used</strong><span>${getRadio('ai-used')}</span></div>
+      <div class="final-review-row"><strong>Preprint Submitted</strong><span>${getRadio('preprint')}</span></div>
+      <div class="final-review-row"><strong>No. of Authors</strong><span>${getVal('s1-num-authors')}</span></div>
+      <div class="final-review-row"><strong>No. of Figures</strong><span>${getVal('s1-num-figures')}</span></div>
+      <div class="final-review-row"><strong>No. of Tables</strong><span>${getVal('s1-num-tables')}</span></div>
+    </div>
+    <div class="final-review-block">
+      <div class="final-review-block-head">2. Article Title, Abstract &amp; Keywords</div>
+      <div class="final-review-row"><strong>Article Title</strong><span>${escHtml(getVal('s2-title'))}</span></div>
+      <div class="final-review-row"><strong>Running Title</strong><span>${escHtml(getVal('s2-running-title')) || 'N/A'}</span></div>
+      <div class="final-review-row"><strong>Keywords</strong><span>${keywords.join(', ') || '—'}</span></div>
+      <div class="final-review-row"><strong>Abstract</strong><span style="white-space:pre-line;line-height:1.6;">${escHtml(getVal('s2-abstract'))}</span></div>
+    </div>
+    <div class="final-review-block">
+      <div class="final-review-block-head">3. Author Information</div>
+      <div class="final-review-row"><strong>Authors</strong><span>${authorList}</span></div>
+    </div>
+    <div class="final-review-block">
+      <div class="final-review-block-head">4–6. Files Uploaded</div>
+      <div class="final-review-row"><strong>All Files</strong><span>${allFiles}</span></div>
+    </div>
+    <div class="final-review-block">
+      <div class="final-review-block-head">7. Suggested Reviewers</div>
+      <div class="final-review-row"><strong>Reviewers</strong><span>${reviewerList}</span></div>
+    </div>`;
+}
+
+// ── Final submit ───────────────────────────────────────────────
+async function finalSubmit() {
+  const btn = document.getElementById('final-approve-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Submitting…'; }
+
+  const session = getSession();
+  const getVal  = id => document.getElementById(id)?.value || '';
+  const getRadio = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '';
+
+  // Build local record
+  const localEntry = {
+    id:           'CRJ-' + Date.now().toString().slice(-6),
+    email:        session?.email,
+    title:        getVal('s2-title').trim(),
+    running_title:getVal('s2-running-title').trim(),
+    article_type: getVal('s1-article-type'),
+    subspecialty: getVal('s1-subspecialty'),
+    ctr_number:   getVal('s1-ctr'),
+    category:     'medical',
+    authors:      authorRows.map(a => `${a.firstName} ${a.lastName}`).join(', '),
+    abstract:     getVal('s2-abstract').trim(),
+    keywords:     keywords.join(', '),
+    conflict_of_interest: getRadio('coi'),
+    financial_support:    getVal('s1-financial'),
+    patient_consent:      getRadio('patient-consent'),
+    irb_permission:       getRadio('irb'),
+    ai_used:              getRadio('ai-used'),
+    preprint_submitted:   getRadio('preprint'),
+    num_authors:          parseInt(getVal('s1-num-authors')) || 1,
+    num_figures:          parseInt(getVal('s1-num-figures')) || 0,
+    num_tables:           parseInt(getVal('s1-num-tables'))  || 0,
+    files:        Object.entries(subFiles).flatMap(([,files]) => files.map(f => f.name)),
+    status:       'pending',
+    date:         new Date().toLocaleDateString('en-IN'),
+    reviewNote:   '',
+  };
+
+  // Save locally first
+  const subs = getLocalSubmissions();
+  subs.push(localEntry);
+  saveLocalSubmissions(subs);
+
+  // POST to backend
+  try {
+    const formData = new FormData();
+    formData.append('title',               localEntry.title);
+    formData.append('running_title',       localEntry.running_title);
+    formData.append('article_type',        localEntry.article_type);
+    formData.append('subspecialty',        localEntry.subspecialty);
+    formData.append('ctr_number',          localEntry.ctr_number);
+    formData.append('category',            'medical');
+    formData.append('authors',             localEntry.authors);
+    formData.append('abstract',            localEntry.abstract);
+    formData.append('keywords',            localEntry.keywords);
+    formData.append('conflict_of_interest',localEntry.conflict_of_interest);
+    formData.append('conflict_details',    getVal('s1-coi-details'));
+    formData.append('financial_support',   localEntry.financial_support);
+    formData.append('patient_consent',     localEntry.patient_consent);
+    formData.append('irb_permission',      localEntry.irb_permission);
+    formData.append('ai_used',             localEntry.ai_used);
+    formData.append('preprint_submitted',  localEntry.preprint_submitted);
+    formData.append('num_authors',         localEntry.num_authors);
+    formData.append('num_figures',         localEntry.num_figures);
+    formData.append('num_tables',          localEntry.num_tables);
+    formData.append('suggested_reviewers', JSON.stringify(reviewerRows));
+
+    // Append all files with their category
+    Object.entries(subFiles).forEach(([category, files]) => {
+      files.forEach(f => {
+        formData.append('files', f);
+        formData.append('file_categories', category);
+      });
+    });
+
+    await fetch(`${API}/submissions/`, {
+      method:  'POST',
+      headers: { 'Authorization': `Token ${session?.token}` },
+      body:    formData,
+    });
+  } catch (_) { /* backend offline - localStorage saved */ }
+
+  // Reset form
+  resetSubmitForm();
+  if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Approve and Submit'; }
+
+  showToast('Submitted!', `"${localEntry.title.slice(0,50)}…" has been submitted successfully.`, 'success');
+  showSection('submissions');
+  loadSubmissions();
+}
+
+// ── Reset form ─────────────────────────────────────────────────
+function resetSubmitForm() {
+  // Reset to disclaimer screen
+  document.getElementById('sub-disclaimer-screen').style.display = 'block';
+  document.getElementById('sub-wizard-screen').style.display     = 'none';
+  goToSubStep(1);
+
+  // Clear all fields
+  ['s1-article-type','s1-subspecialty','s1-ctr','s1-financial','s1-num-authors','s1-num-figures','s1-num-tables',
+   's2-title','s2-running-title','s2-abstract'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = id === 's1-financial' ? 'Nil' : id.startsWith('s1-num') ? '0' : '';
+  });
+
+  // Reset radios
+  document.querySelector('input[name="coi"][value="no"]')?.click();
+  document.querySelector('input[name="patient-consent"][value="not_applicable"]')?.click();
+  document.querySelector('input[name="irb"][value="waived"]')?.click();
+  document.querySelector('input[name="ai-used"][value="no"]')?.click();
+  document.querySelector('input[name="preprint"][value="no"]')?.click();
+
+  // Clear files
+  Object.keys(subFiles).forEach(k => subFiles[k] = []);
+  ['fuz-files-cover','fuz-files-manuscript','fuz-files-figures','fuz-files-supplementary',
+   'fuz-files-guideline','fuz-files-copyright','fuz-files-disclosure','fuz-files-other'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '';
+  });
+
+  // Clear keywords
+  keywords = [];
+  renderKeywordTags();
+
+  // Reset author/reviewer tables
+  authorRows = [];
+  reviewerRows = [];
+  initAuthorTable();
+}
+
+// ── Utility ────────────────────────────────────────────────────
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 const dropZone = document.getElementById('file-drop-zone');
