@@ -1232,23 +1232,19 @@ input, textarea, select {
 .dashboard {
   background: var(--bg-warm);
   min-height: calc(100vh - 240px);
-  padding: 36px 0 64px;
+  padding: 20px 0 40px;
 }
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 28px;
+  grid-template-columns: 220px 1fr;
+  gap: 16px;
 }
 @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
 .dashboard-sidebar {
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 24px;
-  align-self: start;
-  position: sticky;
-  top: 96px;
-}
+  padding: 16px;
 @media (max-width: 900px) { .dashboard-sidebar { position: static; } }
 .dashboard-user {
   text-align: center;
@@ -1310,7 +1306,7 @@ input, textarea, select {
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 32px;
+  padding: 20px;
   min-height: 520px;
 }
 @media (max-width: 600px) { .dashboard-main { padding: 22px; } }
