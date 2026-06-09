@@ -93,11 +93,6 @@ function renderAdminSubmissions(subs) {
     ? subs.map(s => buildAdminSubCard(s)).join('')
     : '<div class="empty-state"><h3>No submissions yet</h3></div>';
 }
-// ================================================================
-//  EDIT INSTRUCTION:
-//  In dashboard.js, REPLACE the buildAdminSubCard() function
-//  with this version — shows all new fields from the 7-step form
-// ================================================================
 
 function buildAdminSubCard(s) {
   const statusMap = {
@@ -198,13 +193,10 @@ function toggleAdminDetails(subId) {
 window.toggleAdminDetails = toggleAdminDetails;
 
 
-// ================================================================
-//  EDIT: Also update buildSubmissionCard() for USER side
-//  REPLACE the existing buildSubmissionCard() with this version
-//  which shows the resubmit button if rejected
-// ================================================================
 
 function buildSubmissionCard(s, showTimeline = false) {
+
+  
   const statusMap = {
     pending:   { cls: 'status-pending',  label: 'Submitted — Awaiting Review' },
     screening: { cls: 'status-review',   label: 'Editorial Screening' },
@@ -291,26 +283,7 @@ function resubmitManuscript(subId) {
   showToast('Resubmit', 'Complete the disclaimer then your previous details will be pre-filled.', 'success');
 }
 
-// Modified agreeDisclaimer to handle resubmit pre-fill
-const _origAgreeDisclaimer = window.agreeDisclaimer;
-window.agreeDisclaimer = function() {
-  document.getElementById('sub-disclaimer-screen').style.display = 'none';
-  document.getElementById('sub-wizard-screen').style.display     = 'block';
-  initAuthorTable();
-  addReviewerRow();
 
-  // Pre-fill if resubmitting
-  if (window._resubmitData) {
-    const d = window._resubmitData;
-    if (d.title)       { const el = document.getElementById('s2-title');        if (el) { el.value = d.title;       updateCounter('s2-title','s2-title-count','s2-title-words',250); } }
-    if (d.article_type){ const el = document.getElementById('s1-article-type'); if (el) el.value = d.article_type; }
-    if (d.subspecialty){ const el = document.getElementById('s1-subspecialty'); if (el) el.value = d.subspecialty; }
-    if (d.abstract)    { const el = document.getElementById('s2-abstract');     if (el) { el.value = d.abstract;    updateAbstractCounter(); } }
-    if (d.keywords)    { keywords = d.keywords.split(',').map(k=>k.trim()).filter(Boolean); renderKeywordTags(); }
-    showToast('Pre-filled', 'Previous submission details have been loaded. Please make your edits.', 'success');
-    window._resubmitData = null;
-  }
-};
 
 async function updateSubmissionStatus(subId, status) {
   try {
@@ -582,65 +555,6 @@ function renderFullSubmissions(subs) {
   list.innerHTML = [...subs].reverse().map(s => buildSubmissionCard(s, true)).join('');
 }
 
-function buildSubmissionCard(s, showTimeline = false) {
-  const statusMap = {
-    pending:   { cls: 'status-pending',  label: 'Submitted — Awaiting Review' },
-    screening: { cls: 'status-review',   label: 'Editorial Screening' },
-    review:    { cls: 'status-review',   label: 'Under Peer Review' },
-    revision:  { cls: 'status-pending',  label: 'Revision Requested' },
-    approved:  { cls: 'status-approved', label: 'Accepted for Publication' },
-    rejected:  { cls: 'status-rejected', label: 'Not Accepted' },
-    published: { cls: 'status-published',label: 'Published' },
-  };
-  const st    = statusMap[s.status] || statusMap.pending;
-  const files = Array.isArray(s.files) ? s.files : [];
-
-  let timelineHtml = '';
-  if (showTimeline) {
-    const stages = [
-      { label: 'Submitted',   done: true },
-      { label: 'Screening',   done: ['screening','review','revision','approved','published','rejected'].includes(s.status) },
-      { label: 'Peer Review', done: ['approved','published','rejected'].includes(s.status), current: s.status === 'review' },
-      { label: 'Decision',    done: ['approved','published','rejected'].includes(s.status) },
-      { label: 'Published',   done: s.status === 'published' },
-    ];
-    timelineHtml = `<div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);">
-      <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:12px;">Review Progress</div>
-      <div style="display:flex;gap:0;flex-wrap:wrap;">
-        ${stages.map((st2, i) => `
-          <div style="flex:1;min-width:80px;text-align:center;position:relative;padding-top:24px;">
-            <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;border:2px solid ${st2.done?'var(--success)':st2.current?'var(--primary)':'var(--border-dark)'};background:${st2.done?'var(--success)':st2.current?'var(--primary)':'var(--bg)'};display:grid;place-items:center;">
-              ${st2.done?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>':''}
-            </div>
-            ${i < stages.length-1?`<div style="position:absolute;top:9px;left:calc(50% + 10px);right:0;height:2px;background:${st2.done?'var(--success)':'var(--border)'};"></div>`:''}
-            <span style="font-size:.72rem;color:var(--text-muted);display:block;">${st2.label}</span>
-          </div>`).join('')}
-      </div>
-    </div>`;
-  }
-
-  return `
-  <div class="submission-item">
-    <div class="submission-head">
-      <div>
-        <p class="submission-title">${s.title}</p>
-        <div class="submission-meta">
-          <span><strong>ID:</strong> ${s.id || s.submission_id || '—'}</span>
-          <span><strong>Type:</strong> ${s.type || s.article_type || '—'}</span>
-          <span><strong>Submitted:</strong> ${s.date || '—'}</span>
-        </div>
-      </div>
-      <span class="status ${st.cls}">${st.label}</span>
-    </div>
-    ${files.length ? `<div class="submission-files">
-      ${files.map(f => `<span style="display:inline-flex;align-items:center;gap:5px;font-size:.82rem;padding:4px 10px;background:var(--bg-alt);border:1px solid var(--border);border-radius:999px;color:var(--text-secondary);">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>${f}
-      </span>`).join('')}
-    </div>` : ''}
-    ${s.reviewNote ? `<div class="submission-review"><strong>Editor's Note:</strong> ${s.reviewNote}</div>` : ''}
-    ${timelineHtml}
-  </div>`;
-}
 
 function updateStats(subs) {
   setText('stat-total-sub', subs.length);
@@ -651,26 +565,6 @@ function updateStats(subs) {
   const badge = document.getElementById('pending-badge');
   if (badge) { badge.style.display = pending > 0 ? 'inline-flex' : 'none'; badge.textContent = pending; }
 }
-
-/* ---- Submit form steps ---- */
-
-// ================================================================
-//  EDIT INSTRUCTION FOR dashboard.js:
-//
-//  1. DELETE these old functions entirely:
-//     - goToStep()
-//     - goToStepUI()
-//     - populateReviewDetails()
-//     - submitManuscript()
-//     - showUploadProgress()
-//     - handleFileSelect()
-//     - renderSelectedFiles()
-//     - removeFile()
-//     - formatBytes()
-//     - (drag/drop zone block for #file-drop-zone)
-//
-//  2. PASTE this entire block in their place.
-// ================================================================
 
 
 
