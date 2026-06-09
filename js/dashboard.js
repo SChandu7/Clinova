@@ -23,10 +23,7 @@ const subFiles = {
   other:         [],
 };
 
-function getSession() {
-  try { return JSON.parse(localStorage.getItem('clinova_session')); } catch { return null; }
-}
-window.getSession = getSession;
+
 
 function showAdminDashboard() {
   document.getElementById('auth-view').style.display      = 'none';
@@ -464,7 +461,7 @@ function showDashboard() {
 
   loadSubmissions();
   populateProfileForm();
-  updateAuthHeader();
+  
 }
 
 /* ---- Section nav ---- */
@@ -1160,9 +1157,7 @@ function showAlert(id, msg, type) {
   setTimeout(() => el.innerHTML = '', 5000);
 }
 
-/* ---- Utils ---- */
-function setText(id, val)  { const el = document.getElementById(id); if (el) el.textContent = val || ''; }
-function setValue(id, val) { const el = document.getElementById(id); if (el) el.value       = val || ''; }
+function setValue(id, val) { const el = document.getElementById(id); if (el) el.value = val || ''; }
 
 window.toggleAdminDetails = toggleAdminDetails;
 
