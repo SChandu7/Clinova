@@ -477,8 +477,8 @@ function showSection(name) {
   if (btn)     btn.classList.add('active');
 
   // ── ADD THIS ──
-  if (sessionStorage.getItem('clinova_admin')) {
-    loadAdminSubmissions();  // always reload for admin
+ if (sessionStorage.getItem('clinova_admin') && name !== 'submit') {
+    loadAdminSubmissions();
   } else {
     if (name === 'submissions') loadSubmissions();
   }
