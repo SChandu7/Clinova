@@ -6,7 +6,22 @@
 const API = 'https://api.chandus7.in/api/clinova';
 let currentUser = null;
 let selectedFiles = [];
-let currentStep = 1;
+let currentStep     = 1;
+let subCurrentStep  = 1;
+let authorRows      = [];
+let reviewerRows    = [];
+let keywords        = [];
+const SUB_TOTAL_STEPS = 7;
+const subFiles = {
+  cover_letter:  [],
+  manuscript:    [],
+  figure:        [],
+  supplementary: [],
+  guideline:     [],
+  copyright:     [],
+  disclosure:    [],
+  other:         [],
+};
 
 function showAdminDashboard() {
   document.getElementById('auth-view').style.display      = 'none';
@@ -639,7 +654,6 @@ function updateStats(subs) {
 
 /* ---- Submit form steps ---- */
 
-window.goToStep = goToStep;
 // ================================================================
 //  EDIT INSTRUCTION FOR dashboard.js:
 //
@@ -1174,16 +1188,6 @@ function escHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-const dropZone = document.getElementById('file-drop-zone');
-if (dropZone) {
-  dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('is-dragover'); });
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('is-dragover'));
-  dropZone.addEventListener('drop', e => {
-    e.preventDefault(); dropZone.classList.remove('is-dragover');
-    [...e.dataTransfer.files].forEach(f => { if (!selectedFiles.find(x => x.name === f.name)) selectedFiles.push(f); });
-    renderSelectedFiles();
-  });
-}
 
 /* ---- Profile ---- */
 function populateProfileForm() {
