@@ -672,28 +672,7 @@ function updateStats(subs) {
 //  2. PASTE this entire block in their place.
 // ================================================================
 
-// ── Submission wizard state ────────────────────────────────────
-let subCurrentStep  = 1;
-const SUB_TOTAL_STEPS = 7; // steps 1-7, then step 8 = final review
 
-// All uploaded files keyed by category
-const subFiles = {
-  cover_letter:  [],
-  manuscript:    [],
-  figure:        [],
-  supplementary: [],
-  guideline:     [],
-  copyright:     [],
-  disclosure:    [],
-  other:         [],
-};
-
-// Author rows state
-let authorRows = [];
-let reviewerRows = [];
-
-// Keywords
-let keywords = [];
 
 // ── Disclaimer ────────────────────────────────────────────────
 function agreeDisclaimer() {
