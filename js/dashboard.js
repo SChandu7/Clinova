@@ -23,6 +23,11 @@ const subFiles = {
   other:         [],
 };
 
+function getSession() {
+  try { return JSON.parse(localStorage.getItem('clinova_session')); } catch { return null; }
+}
+window.getSession = getSession;
+
 function showAdminDashboard() {
   document.getElementById('auth-view').style.display      = 'none';
   document.getElementById('dashboard-view').style.display = 'block';
@@ -568,13 +573,24 @@ function updateStats(subs) {
 
 
 
-// ── Disclaimer ────────────────────────────────────────────────
 function agreeDisclaimer() {
   document.getElementById('sub-disclaimer-screen').style.display = 'none';
   document.getElementById('sub-wizard-screen').style.display     = 'block';
   initAuthorTable();
-  addReviewerRow(); // start with one reviewer row
+  addReviewerRow();
+
+  if (window._resubmitData) {
+    const d = window._resubmitData;
+    if (d.title)       { const el = document.getElementById('s2-title');        if (el) { el.value = d.title;       updateCounter('s2-title','s2-title-count','s2-title-words',250); } }
+    if (d.article_type){ const el = document.getElementById('s1-article-type'); if (el) el.value = d.article_type; }
+    if (d.subspecialty){ const el = document.getElementById('s1-subspecialty'); if (el) el.value = d.subspecialty; }
+    if (d.abstract)    { const el = document.getElementById('s2-abstract');     if (el) { el.value = d.abstract;    updateAbstractCounter(); } }
+    if (d.keywords)    { keywords = d.keywords.split(',').map(k=>k.trim()).filter(Boolean); renderKeywordTags(); }
+    showToast('Pre-filled', 'Previous submission details have been loaded.', 'success');
+    window._resubmitData = null;
+  }
 }
+window.agreeDisclaimer = agreeDisclaimer;
 
 // ── Step navigation ───────────────────────────────────────────
 function subNext() {
@@ -1149,3 +1165,25 @@ function setText(id, val)  { const el = document.getElementById(id); if (el) el.
 function setValue(id, val) { const el = document.getElementById(id); if (el) el.value       = val || ''; }
 
 window.toggleAdminDetails = toggleAdminDetails;
+
+window.subNext            = subNext;
+window.subPrev            = subPrev;
+window.addAuthorRow       = addAuthorRow;
+window.removeAuthorRow    = removeAuthorRow;
+window.setCorresponding   = setCorresponding;
+window.updateAuthor       = updateAuthor;
+window.addReviewerRow     = addReviewerRow;
+window.removeReviewerRow  = removeReviewerRow;
+window.triggerFileInput   = triggerFileInput;
+window.handleFUZ          = handleFUZ;
+window.removeFUZFile      = removeFUZFile;
+window.handleKeywordInput = handleKeywordInput;
+window.removeKeyword      = removeKeyword;
+window.toggleCOI          = toggleCOI;
+window.styleRadioInline   = styleRadioInline;
+window.finalSubmit        = finalSubmit;
+window.resubmitManuscript = resubmitManuscript;
+window.agreeDisclaimer    = agreeDisclaimer;
+window.updateCounter      = updateCounter;
+window.updateCounterInput = updateCounterInput;
+window.updateAbstractCounter = updateAbstractCounter;
