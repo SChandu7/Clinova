@@ -2,119 +2,17 @@
 //  Clinova – Demo Data
 //  All demo articles, categories, editorial board data
 // ============================================================
-
-const CLINOVA_ARTICLES = [
-  {
-    id: "CMRJ_001_2026",
-    title: "Angiogenic Biomarkers and Maternal Cardiac Indices in Pre-eclampsia: A Multi-centre Prospective Study",
-    authors: "Dr. Ananya Krishnamurthy, Dr. Priya Menon, Dr. S. Venkataraman, Prof. Leena Das",
-    institution: "AIIMS New Delhi; IIT Madras; NIMHANS Bengaluru",
-    type: "Original Article",
-    category: "medical",
-    categoryLabel: "Medical & Health",
-    doi: "10.29847/CMRJ_001_2026",
-    volume: "Vol. 8, No. 1",
-    year: 2026,
-    date: "March 2026",
-    abstract: "Background: Pre-eclampsia remains a leading cause of maternal and perinatal morbidity worldwide, affecting 2–8% of pregnancies globally. Angiogenic imbalance plays a central role in its pathophysiology. This study aimed to evaluate the utility of angiogenic biomarkers—sFlt-1, PlGF, and their ratio—alongside maternal cardiac function indices in predicting adverse outcomes. Methods: A prospective multi-centre cohort study was conducted across three tertiary care hospitals in India between January 2024 and December 2025. A total of 320 pregnant women (160 with pre-eclampsia, 160 normotensive controls) were enrolled. Serum sFlt-1, PlGF, NT-proBNP, and troponin-I were measured at 28, 34, and 38 weeks. Cardiac parameters including GLS, GCW, and GWI were assessed by 2D speckle-tracking echocardiography. Results: sFlt-1/PlGF ratio was significantly elevated in pre-eclamptic women (median 112.3 vs. 14.6, p<0.001). GLS was impaired (−16.4±2.1% vs. −20.2±1.4%, p<0.001). A composite score incorporating sFlt-1/PlGF and GLS demonstrated AUC of 0.94 for predicting severe maternal outcomes. Conclusions: Combined angiogenic and echocardiographic assessment provides superior prediction of adverse maternal outcomes in pre-eclampsia compared to either parameter alone.",
-    keywords: ["pre-eclampsia", "sFlt-1", "PlGF", "angiogenic markers", "maternal cardiac function", "speckle tracking echocardiography", "GLS"],
-    citations: 3,
-    views: 412,
-    fileUrl: null,
-    status: "published",
-    thumb: "roc"
-  },
-  {
-    id: "CMRJ_002_2026",
-    title: "Deep Learning-Based Automated Detection of Diabetic Retinopathy Using Fundus Photographs: Validation on a 12,000-Image Dataset",
-    authors: "Dr. Priya Menon, Mr. Arjun Subramaniam, Dr. K. Rajeswari, Prof. M. Chandrasekaran",
-    institution: "IIT Madras; Sankara Nethralaya Chennai; BITS Pilani",
-    type: "Original Article",
-    category: "tech",
-    categoryLabel: "Engineering & Tech",
-    doi: "10.29847/CMRJ_002_2026",
-    volume: "Vol. 8, No. 1",
-    year: 2026,
-    date: "March 2026",
-    abstract: "Background: Diabetic retinopathy (DR) is the leading cause of preventable blindness globally, with India bearing a disproportionate burden. Automated screening using deep learning can bridge the gap in specialist availability. This study developed and validated a convolutional neural network (CNN) architecture for grading DR severity from fundus photographs. Methods: A multi-class CNN model (EfficientNet-B4 backbone with attention mechanisms) was trained on 9,600 labelled fundus images and validated on 2,400 held-out images from three clinical centres. Images were graded into five DR severity classes per ETDRS standards. Results: The model achieved an overall accuracy of 94.2%, with AUC of 0.97 for referable DR detection (Grade ≥2). Sensitivity was 93.8% and specificity 95.1% for sight-threatening DR. Processing time was 0.8 seconds per image on standard GPU hardware. The model demonstrated consistent performance across age groups and image quality levels. Conclusions: Our deep learning system demonstrates clinical-grade accuracy for automated DR screening and is suitable for deployment in resource-limited community health settings.",
-    keywords: ["diabetic retinopathy", "deep learning", "CNN", "fundus photography", "automated screening", "EfficientNet", "computer vision"],
-    citations: 7,
-    views: 689,
-    fileUrl: null,
-    status: "published",
-    thumb: "chart"
-  },
-  {
-    id: "CMRJ_003_2025",
-    title: "MTHFR Gene Polymorphism (C677T) and its Association with Pre-eclampsia Risk: A Systematic Review and Meta-analysis of 48 Studies",
-    authors: "Dr. Sunita Patel, Dr. Obinna Edet, Prof. Arjun Rao, Dr. M. Lavanya",
-    institution: "CSIR-CDRI Lucknow; University of Lagos; Sri Ramachandra Institute Chennai",
-    type: "Review Article",
-    category: "medical",
-    categoryLabel: "Medical & Health",
-    doi: "10.29847/CMRJ_003_2025",
-    volume: "Vol. 7, No. 4",
-    year: 2025,
-    date: "December 2025",
-    abstract: "Background: Methylenetetrahydrofolate reductase (MTHFR) gene polymorphisms, particularly C677T, have been proposed as risk factors for pre-eclampsia through elevated homocysteine pathways. However, existing studies show heterogeneous results across populations. We conducted a comprehensive meta-analysis to quantify this association. Methods: We systematically searched MEDLINE, EMBASE, SCOPUS, and CINAHL for studies published from 2000 to 2025. Studies reporting MTHFR C677T genotype frequencies in pre-eclamptic and normotensive pregnant women were included. Pooled odds ratios (OR) with 95% CI were calculated using random-effects models. Heterogeneity was assessed using I² statistics. Results: Forty-eight eligible studies encompassing 12,640 pre-eclamptic cases and 18,920 controls from 24 countries were included. The TT genotype was significantly associated with pre-eclampsia risk (OR 1.68, 95% CI 1.43–1.97, p<0.001), with moderate heterogeneity (I²=52%). The association was strongest in Asian populations (OR 2.14) compared to European (OR 1.41). Conclusions: MTHFR C677T TT genotype confers a significant but modest increase in pre-eclampsia risk, with notable population-based variation. Routine screening may be beneficial in high-risk Asian populations.",
-    keywords: ["MTHFR", "C677T polymorphism", "pre-eclampsia", "meta-analysis", "homocysteine", "genetics", "obstetrics"],
-    citations: 12,
-    views: 1043,
-    fileUrl: null,
-    status: "published",
-    thumb: "bar"
-  },
-  {
-    id: "CMRJ_004_2025",
-    title: "IoT-Based Real-Time Soil Health Monitoring System with NPK, pH and Pesticide Sensors for Precision Agriculture",
-    authors: "Mr. S. Chandra Sekhar, Dr. T. Aravind Kumar, Prof. B. Satyanarayana",
-    institution: "Andhra University, Visakhapatnam; JNTU Kakinada; IIT Hyderabad",
-    type: "Technical Communication",
-    category: "tech",
-    categoryLabel: "Engineering & Tech",
-    doi: "10.29847/CMRJ_004_2025",
-    volume: "Vol. 7, No. 3",
-    year: 2025,
-    date: "September 2025",
-    abstract: "This paper presents a low-cost IoT-based soil health monitoring system integrating NPK, pH, TDS, and toxic gas / pesticide sensors with ESP32 microcontrollers, cloud storage (AWS IoT Core), and a Flutter-based mobile dashboard. The system enables real-time continuous monitoring across agricultural fields with sub-minute data latency. NPK sensor calibration achieved R²=0.97 correlation with laboratory ICP-OES measurements across 240 soil samples from Andhra Pradesh. pH accuracy was ±0.1 pH units. The mobile application provides crop-specific fertilizer recommendations using a rule-based AI engine trained on agronomic standards. Field trials over one growing season demonstrated 18% reduction in fertilizer expenditure and 12% yield improvement compared to conventional soil testing. The complete system cost is under ₹8,500 per unit, making it viable for smallholder farmers across developing economies.",
-    keywords: ["IoT", "soil health", "NPK sensor", "ESP32", "precision agriculture", "AWS IoT", "Flutter", "mobile app"],
-    citations: 5,
-    views: 823,
-    fileUrl: null,
-    status: "published",
-    thumb: "scatter"
-  },
-  {
-    id: "CMRJ_005_2025",
-    title: "Nano-Curcumin Formulation Enhances Chemosensitivity in Triple-Negative Breast Cancer via PI3K/Akt/mTOR Pathway Inhibition",
-    authors: "Dr. Vandana Iyer, Dr. R. Krishnaswamy, Dr. T. Bhattacharya, Prof. S. K. Nair",
-    institution: "TATA Memorial Hospital Mumbai; CSIR-NCL Pune; ACTREC Mumbai",
-    type: "Original Article",
-    category: "science",
-    categoryLabel: "Natural Sciences",
-    doi: "10.29847/CMRJ_005_2025",
-    volume: "Vol. 7, No. 3",
-    year: 2025,
-    date: "September 2025",
-    abstract: "Triple-negative breast cancer (TNBC) lacks targetable hormone and HER2 receptors, limiting therapeutic options and leading to poor prognosis. Curcumin has demonstrated anti-tumour properties but has low bioavailability. We developed a poly-lactic-co-glycolic acid (PLGA) nano-encapsulated curcumin formulation and evaluated its efficacy in TNBC. Nanoparticle characterisation showed mean particle size of 142±18 nm, encapsulation efficiency of 87.3%, and sustained release over 72 hours. In vitro cytotoxicity assays in MDA-MB-231 and BT-549 cell lines demonstrated IC50 reduction of 6.4-fold compared to free curcumin. Flow cytometry confirmed enhanced G2/M arrest and apoptosis. Western blot analysis showed significant downregulation of p-Akt, p-mTOR, and p-S6K1 expression. In vivo xenograft models demonstrated 73% tumour volume reduction versus 41% for free curcumin (p<0.001). The nano-formulation significantly enhances curcumin's chemosensitising potential in TNBC via PI3K/Akt/mTOR pathway suppression.",
-    keywords: ["nano-curcumin", "PLGA nanoparticles", "triple-negative breast cancer", "PI3K/Akt/mTOR", "chemosensitivity", "drug delivery", "apoptosis"],
-    citations: 9,
-    views: 756,
-    fileUrl: null,
-    status: "published",
-    thumb: "line"
-  }
-];
+const CLINOVA_ARTICLES = [];
 
 // Stats shown on homepage
 const CLINOVA_STATS = {
-  totalArticles: 248,
-  totalAuthors: 1430,
+  totalArticles: 0,
+  totalAuthors: 0,
   disciplines: 3,
   citeScore: 0.9,
-  estYear: 2019,
+  estYear: 2026,
   avgReview: "18 days",
-  countries: 40
+  countries: 1
 };
 
 // Category counts
